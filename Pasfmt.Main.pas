@@ -1,4 +1,4 @@
-﻿unit Pasfmt.Main;
+unit Pasfmt.Main;
 
 interface
 
@@ -83,7 +83,7 @@ begin
   FEditorIndex := (BorlandIDEServices as IOTAEditorServices).AddNotifier(OnSaveInstaller);
 
   FPasfmtMenu := TMenuItem.Create((BorlandIDEServices as INTAServices).MainMenu);
-  FPasfmtMenu.Caption := 'Pasf&mt';
+  FPasfmtMenu.Caption := '&Pasfmt';
 
   MenuItem := TMenuItem.Create(FPasfmtMenu);
   MenuItem.Name := 'PasfmtFormatItem';
@@ -95,7 +95,7 @@ begin
   MenuItem.Action := CreateAction('PasfmtOpenSettings', '&Settings...', OnSettingsActionExecute);
   FPasfmtMenu.Add(MenuItem);
 
-  (BorlandIDEServices as INTAServices).AddActionMenu('ToolsMenu', nil, FPasfmtMenu);
+  (BorlandIDEServices as INTAServices).AddActionMenu('ViewTranslationManagerMenu', nil, FPasfmtMenu);
   FKeyboardBindingIndex :=
       (BorlandIDEServices as IOTAKeyboardServices).AddKeyboardBinding(TPasfmtKeyboardBinding.Create);
   FAddInOptions := TPasfmtAddInOptions.Create;
