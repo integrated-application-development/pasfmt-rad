@@ -2,12 +2,15 @@
 
 interface
 
-uses ToolsAPI, System.Classes, Vcl.Forms, DockForm, System.Generics.Collections;
+uses ToolsAPI, System.Classes, Vcl.Forms, DockForm, System.Generics.Collections, Pasfmt.FormatEditor;
 
 type
+  TConfigureFormatterProc = reference to procedure(var Formatter: TEditBufferFormatter);
+
   TFormatOnSaveInstallerNotifier = class(TNotifierObject, INTAEditServicesNotifier)
   private
     FFormatOnSaveModules: TDictionary<IOTAModule, Integer>;
+    FConfigureFormatterProc: TConfigureFormatterProc;
   public
     constructor Create;
     destructor Destroy; override;
@@ -24,12 +27,15 @@ type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+
+    property ConfigureFormatter: TConfigureFormatterProc read FConfigureFormatterProc write FConfigureFormatterProc;
   end;
 
   TFormatOnSaveModuleNotifier = class(TNotifierObject, IOTAModuleNotifier)
   private
     FModule: IOTAModule;
     FOnDestroyed: TNotifyEvent;
+    FConfigureFormatterProc: TConfigureFormatterProc;
   public
     constructor Create(Module: IOTAModule);
 
@@ -42,13 +48,14 @@ type
 
     property Module: IOTAModule read FModule;
     property OnDestroyed: TNotifyEvent read FOnDestroyed write FOnDestroyed;
+    property ConfigureFormatter: TConfigureFormatterProc read FConfigureFormatterProc write FConfigureFormatterProc;
   end;
 
 function OnSaveInstaller: TFormatOnSaveInstallerNotifier;
 
 implementation
 
-uses System.SysUtils, Pasfmt.Log, Pasfmt.FormatEditor, Pasfmt.Settings;
+uses System.SysUtils, Pasfmt.Log, Pasfmt.Settings;
 
 var
   // TFormatOnSaveInstallerNotifier
@@ -135,6 +142,7 @@ begin
   if PasfmtSettings.FormatOnSave and not FFormatOnSaveModules.ContainsKey(Module) then begin
     Notifier := TFormatOnSaveModuleNotifier.Create(Module);
     Notifier.OnDestroyed := OnFormatOnSaveNotifierDestroyed;
+    Notifier.ConfigureFormatter := ConfigureFormatter;
     Index := Module.AddNotifier(Notifier);
     FFormatOnSaveModules.Add(Module, Index);
     Log.Debug('Registered format-on-save for module "%s"', [Module.FileName]);
@@ -182,14 +190,16 @@ end;
 
 procedure TFormatOnSaveModuleNotifier.BeforeSave;
 var
-  Formatter: TEditViewFormatter;
+  Formatter: TEditBufferFormatter;
   Buffer: IOTAEditBuffer;
 begin
   inherited;
   if Supports(Module.CurrentEditor, IOTAEditBuffer, Buffer) then begin
     Log.Debug('Format-on-save triggered for "%s"', [Module.FileName]);
-    Formatter := Default(TEditViewFormatter);
-    Formatter.Formatter.Executable := PasfmtSettings.ExecutablePath;
+    Formatter := Default(TEditBufferFormatter);
+    if Assigned(FConfigureFormatterProc) then begin
+      FConfigureFormatterProc(Formatter);
+    end;
     Formatter.Format(Buffer);
   end;
 end;

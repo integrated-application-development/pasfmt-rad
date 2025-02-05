@@ -5,8 +5,8 @@ interface
 uses ToolsAPI, Pasfmt.FormatCore;
 
 type
-  TEditViewFormatter = record
-    Formatter: TFormatter;
+  TEditBufferFormatter = record
+    Core: TFormatter;
 
     procedure Format(Buffer: IOTAEditBuffer);
   end;
@@ -107,7 +107,7 @@ end;
 
 //______________________________________________________________________________________________________________________
 
-procedure TEditViewFormatter.Format(Buffer: IOTAEditBuffer);
+procedure TEditBufferFormatter.Format(Buffer: IOTAEditBuffer);
 var
   SourceEditor: IOTAEditorContent;
   EditorContent: UTF8String;
@@ -126,7 +126,7 @@ begin
   SetBufferViewMessages(Buffer, 'Formatting...');
 
   EditorContent := StreamToUTF8(SourceEditor.Content);
-  FormatResult := Formatter.Format(EditorContent, GetBufferViewCursors(Buffer));
+  FormatResult := Core.Format(EditorContent, GetBufferViewCursors(Buffer));
 
   if FormatResult.ErrorInfo <> '' then begin
     if ContainsText(FormatResult.ErrorInfo, 'error') then begin

@@ -7,7 +7,8 @@ function RunProcess(
     const StdIn: UTF8String;
     out StdOut: UTF8String;
     out StdErr: UTF8String;
-    TimeoutMillis: Cardinal
+    WorkingDirectory: string = '';
+    TimeoutMillis: Cardinal = INFINITE
 ): Cardinal;
 
 implementation
@@ -19,7 +20,8 @@ function RunProcess(
     const StdIn: UTF8String;
     out StdOut: UTF8String;
     out StdErr: UTF8String;
-    TimeoutMillis: Cardinal
+    WorkingDirectory: string = '';
+    TimeoutMillis: Cardinal = INFINITE
 ): Cardinal;
 var
   Buf: TBytes;
@@ -81,7 +83,10 @@ begin
         LocalStdErr := LocalStdErr + UTF8String(PAnsiChar(Data)); //
       end;
 
-  Result := Pasfmt.WinExec.RunWinProcess(CommandLine, StdInHandler, StdOutHandler, StdErrHandler, TimeoutMillis);
+  Result :=
+      Pasfmt
+          .WinExec
+          .RunWinProcess(CommandLine, StdInHandler, StdOutHandler, StdErrHandler, WorkingDirectory, TimeoutMillis);
 
   StdOut := LocalStdOut;
   StdErr := LocalStdErr;

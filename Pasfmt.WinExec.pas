@@ -22,6 +22,7 @@ function RunWinProcess(
     StdIn: TInputHandler;
     StdOut: TOutputHandler;
     StdErr: TOutputHandler;
+    WorkingDirectory: string;
     TimeoutMillis: Cardinal
 ): Cardinal;
 
@@ -110,10 +111,11 @@ function RunWinProcess(
     StdIn: TInputHandler;
     StdOut: TOutputHandler;
     StdErr: TOutputHandler;
+    WorkingDirectory: string;
     TimeoutMillis: Cardinal
 ): Cardinal;
 var
-  SecAtrrs: TSecurityAttributes;
+  SecAttrs: TSecurityAttributes;
   StartupInfo: TStartupInfo;
   ProcessInfo: TProcessInformation;
 
@@ -129,16 +131,14 @@ var
 begin
   Result := High(Cardinal);
 
-  SecAtrrs := Default(TSecurityAttributes);
-  with SecAtrrs do begin
-    nLength := SizeOf(SecAtrrs);
-    bInheritHandle := True;
-    lpSecurityDescriptor := nil;
-  end;
+  SecAttrs := Default(TSecurityAttributes);
+  SecAttrs.nLength := SizeOf(SecAttrs);
+  SecAttrs.bInheritHandle := True;
+  SecAttrs.lpSecurityDescriptor := nil;
 
-  CreatePipe(StdOutPipeRead, StdOutPipeWrite, @SecAtrrs, 0);
-  CreatePipe(StdErrPipeRead, StdErrPipeWrite, @SecAtrrs, 0);
-  CreatePipe(StdInPipeRead, StdInPipeWrite, @SecAtrrs, 0);
+  CreatePipe(StdOutPipeRead, StdOutPipeWrite, @SecAttrs, 0);
+  CreatePipe(StdErrPipeRead, StdErrPipeWrite, @SecAttrs, 0);
+  CreatePipe(StdInPipeRead, StdInPipeWrite, @SecAttrs, 0);
 
   if not SetHandleInformation(StdOutPipeRead, HANDLE_FLAG_INHERIT, 0) then
     RaiseLastOSError;
@@ -148,16 +148,16 @@ begin
     RaiseLastOSError;
 
   StartupInfo := Default(TStartupInfo);
-  with StartupInfo do begin
-    cb := SizeOf(StartupInfo);
-    dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
-    wShowWindow := SW_HIDE;
-    hStdInput := StdInPipeRead;
-    hStdOutput := StdOutPipeWrite;
-    hStdError := StdErrPipeWrite;
-  end;
+  StartupInfo.cb := SizeOf(StartupInfo);
+  StartupInfo.dwFlags := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
+  StartupInfo.wShowWindow := SW_HIDE;
+  StartupInfo.hStdInput := StdInPipeRead;
+  StartupInfo.hStdOutput := StdOutPipeWrite;
+  StartupInfo.hStdError := StdErrPipeWrite;
 
-  ProcHandle := CreateProcess(nil, PChar(CommandLine), nil, nil, True, 0, nil, nil, StartupInfo, ProcessInfo);
+  ProcHandle :=
+      CreateProcess(nil, PChar(CommandLine), nil, nil, True, 0, nil, PChar(WorkingDirectory), StartupInfo, ProcessInfo);
+
   if not ProcHandle then
     RaiseLastOSError;
 

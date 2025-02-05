@@ -1,4 +1,4 @@
-unit Pasfmt.Main;
+﻿unit Pasfmt.Main;
 
 interface
 
@@ -15,6 +15,7 @@ uses
     System.SysUtils,
     Vcl.Menus,
     Vcl.ActnList,
+    Pasfmt.FormatCore,
     Pasfmt.FormatEditor,
     Pasfmt.SettingsFrame,
     Pasfmt.Settings,
@@ -22,6 +23,7 @@ uses
     System.JSON,
     Pasfmt.Log,
     Pasfmt.OnSave,
+    System.IOUtils,
     Vcl.Dialogs;
 
 type
@@ -35,10 +37,12 @@ type
 
     function GetPluginVersion: string;
 
-    procedure FormatKeyBinding(const Context: IOTAKeyContext; KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+    procedure OnFormatKeyPress(const Context: IOTAKeyContext; KeyCode: TShortCut; var BindingResult: TKeyBindingResult);
     procedure OnFormatActionExecute(Sender: TObject);
     procedure OnSettingsActionExecute(Sender: TObject);
     procedure Format;
+
+    procedure ConfigureFormatter(var Formatter: TEditBufferFormatter);
   public
     constructor Create;
     destructor Destroy; override;
@@ -54,8 +58,6 @@ type
 
 var
   GPlugin: TPlugin;
-
-  //______________________________________________________________________________________________________________________
 
 procedure Register;
 begin
@@ -81,6 +83,7 @@ var
   PluginName: string;
 begin
   FEditorIndex := (BorlandIDEServices as IOTAEditorServices).AddNotifier(OnSaveInstaller);
+  OnSaveInstaller.ConfigureFormatter := ConfigureFormatter;
 
   FPasfmtMenu := TMenuItem.Create((BorlandIDEServices as INTAServices).MainMenu);
   FPasfmtMenu.Caption := '&Pasfmt';
@@ -130,14 +133,29 @@ end;
 
 //______________________________________________________________________________________________________________________
 
+procedure TPlugin.ConfigureFormatter(var Formatter: TEditBufferFormatter);
+var
+  Project: IOTAProject;
+begin
+  Formatter.Core.Executable := PasfmtSettings.ExecutablePath;
+
+  Project := (BorlandIDEServices as IOTAModuleServices).GetActiveProject;
+  if Assigned(Project) then begin
+    // Ensures pasfmt is reading the config file if present
+    Formatter.Core.WorkingDirectory := TPath.GetDirectoryName(Project.FileName);
+  end;
+end;
+
+//______________________________________________________________________________________________________________________
+
 procedure TPlugin.Format;
 var
   TopView: IOTAEditView;
   Buffer: IOTAEditBuffer;
-  Formatter: TEditViewFormatter;
+  Formatter: TEditBufferFormatter;
 begin
-  Formatter := Default(TEditViewFormatter);
-  Formatter.Formatter.Executable := PasfmtSettings.ExecutablePath;
+  Formatter := Default(TEditBufferFormatter);
+  ConfigureFormatter(Formatter);
 
   TopView := (BorlandIDEServices as IOTAEditorServices).TopView;
   if not Assigned(TopView) then begin
@@ -164,9 +182,9 @@ begin
   (BorlandIDEServices as IOTAServices).GetEnvironmentOptions.EditOptions('', 'Pasfmt');
 end;
 
-procedure TPlugin.FormatKeyBinding( //
+procedure TPlugin.OnFormatKeyPress( //
     const Context: IOTAKeyContext;
-    KeyCode: TShortcut;
+    KeyCode: TShortCut;
     var BindingResult: TKeyBindingResult
 );
 begin
@@ -200,7 +218,7 @@ end;
 procedure TPasfmtKeyboardBinding.BindKeyboard(const BindingServices: IOTAKeyBindingServices);
 begin
   BindingServices
-      .AddKeyBinding([ShortCut(Ord('F'), [ssCtrl, ssAlt])], GPlugin.FormatKeyBinding, nil, 0, '', 'PasfmtFormatItem');
+      .AddKeyBinding([ShortCut(Ord('F'), [ssCtrl, ssAlt])], GPlugin.OnFormatKeyPress, nil, 0, '', 'PasfmtFormatItem');
 end;
 
 function TPasfmtKeyboardBinding.GetBindingType: TBindingType;
