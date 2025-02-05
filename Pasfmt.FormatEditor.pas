@@ -103,13 +103,16 @@ var
   FormatResult: TFormatResult;
   Writer: IOTAEditWriter;
 begin
-  if Buffer.QueryInterface(IOTAEditorContent, SourceEditor) = S_OK then begin
-    EditorContent := StreamToUTF8(SourceEditor.Content);
+  if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
+    Log.Debug('Format request ignored: the editor is not formattable', [Buffer.FileName]);
+    Exit;
   end
-  else begin
-    raise Exception.Create('Editor doesn''t support IOTAEditorContent');
+  else if Buffer.IsReadOnly then begin
+    Log.Debug('Format request ignored: "%s" is read-only', [Buffer.FileName]);
+    Exit;
   end;
 
+  EditorContent := StreamToUTF8(SourceEditor.Content);
   FormatResult := Formatter.Format(EditorContent, GetBufferViewCursors(Buffer));
 
   if FormatResult.ErrorInfo <> '' then begin

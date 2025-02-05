@@ -20,6 +20,7 @@ uses
     Pasfmt.Settings,
     Winapi.Windows,
     System.JSON,
+    Pasfmt.Log,
     Vcl.Dialogs;
 
 type
@@ -126,11 +127,26 @@ end;
 
 procedure TPlugin.Format;
 var
+  TopView: IOTAEditView;
+  Buffer: IOTAEditBuffer;
   Formatter: TEditViewFormatter;
 begin
   Formatter := Default(TEditViewFormatter);
   Formatter.Formatter.Executable := PasfmtSettings.ExecutablePath;
-  Formatter.Format((BorlandIDEServices as IOTAEditorServices).TopView.Buffer);
+
+  TopView := (BorlandIDEServices as IOTAEditorServices).TopView;
+  if not Assigned(TopView) then begin
+    Log.Debug('Format request ignored: there is no active view to format');
+    Exit;
+  end;
+
+  Buffer := TopView.Buffer;
+  if not Assigned(Buffer) then begin
+    Log.Debug('Format request ignored: the active view has no buffer to format');
+    Exit;
+  end;
+
+  Formatter.Format(Buffer);
 end;
 
 procedure TPlugin.OnFormatActionExecute(Sender: TObject);
