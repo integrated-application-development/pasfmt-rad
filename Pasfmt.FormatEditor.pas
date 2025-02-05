@@ -96,6 +96,17 @@ end;
 
 //______________________________________________________________________________________________________________________
 
+procedure SetBufferViewMessages(Buffer: IOTAEditBuffer; Msg: string);
+var
+  I: Integer;
+begin
+  for I := 0 to Buffer.EditViewCount - 1 do begin
+    Buffer.EditViews[I].SetTempMsg(Msg);
+  end;
+end;
+
+//______________________________________________________________________________________________________________________
+
 procedure TEditViewFormatter.Format(Buffer: IOTAEditBuffer);
 var
   SourceEditor: IOTAEditorContent;
@@ -112,6 +123,8 @@ begin
     Exit;
   end;
 
+  SetBufferViewMessages(Buffer, 'Formatting...');
+
   EditorContent := StreamToUTF8(SourceEditor.Content);
   FormatResult := Formatter.Format(EditorContent, GetBufferViewCursors(Buffer));
 
@@ -125,8 +138,12 @@ begin
   end;
   if FormatResult.ExitCode <> 0 then begin
     Log.Error('Format of "%s" failed', [Buffer.FileName]);
+    SetBufferViewMessages(Buffer, 'Format error');
     Exit;
   end;
+
+  SetBufferViewMessages(Buffer, 'Formatted ✓');
+
   if FormatResult.Output = EditorContent then begin
     Log.Debug('"%s" is already formatted, skipping buffer update', [Buffer.FileName]);
     Exit;
