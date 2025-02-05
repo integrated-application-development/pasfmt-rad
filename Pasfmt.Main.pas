@@ -21,6 +21,7 @@ uses
     Winapi.Windows,
     System.JSON,
     Pasfmt.Log,
+    Pasfmt.OnSave,
     Vcl.Dialogs;
 
 type
@@ -29,6 +30,7 @@ type
     FPasfmtMenu: TMenuItem;
     FKeyboardBindingIndex: Integer;
     FInfoIndex: Integer;
+    FEditorIndex: Integer;
     FAddInOptions: TPasfmtAddInOptions;
 
     function GetPluginVersion: string;
@@ -78,6 +80,8 @@ var
   MenuItem: TMenuItem;
   PluginName: string;
 begin
+  FEditorIndex := (BorlandIDEServices as IOTAEditorServices).AddNotifier(OnSaveInstaller);
+
   FPasfmtMenu := TMenuItem.Create((BorlandIDEServices as INTAServices).MainMenu);
   FPasfmtMenu.Caption := 'Pasf&mt';
 
@@ -116,6 +120,7 @@ end;
 
 destructor TPlugin.Destroy;
 begin
+  (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FEditorIndex);
   (BorlandIDEServices as IOTAAboutBoxServices).RemovePluginInfo(FInfoIndex);
   (BorlandIDEServices as INTAEnvironmentOptionsServices).UnregisterAddInOptions(FAddInOptions);
   (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
@@ -159,8 +164,11 @@ begin
   (BorlandIDEServices as IOTAServices).GetEnvironmentOptions.EditOptions('', 'Pasfmt');
 end;
 
-procedure TPlugin
-    .FormatKeyBinding(const Context: IOTAKeyContext; KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+procedure TPlugin.FormatKeyBinding( //
+    const Context: IOTAKeyContext;
+    KeyCode: TShortcut;
+    var BindingResult: TKeyBindingResult
+);
 begin
   Format;
 end;

@@ -27,6 +27,8 @@ type
     ExePathRadioGroup: TRadioGroup;
     ExePathEdit: TEdit;
     ExePathLabel: TLabel;
+    OnSaveCheckBox: TCheckBox;
+    UserSettingsLabel: TLabel;
     procedure ExePathBrowseButtonClick(Sender: TObject);
     procedure ExePathRadioGroupClick(Sender: TObject);
   public
@@ -50,9 +52,21 @@ type
 
 implementation
 
-uses System.IOUtils, Pasfmt.Settings, Pasfmt.Log, System.StrUtils;
+uses System.IOUtils, Pasfmt.Settings, Pasfmt.Log, System.StrUtils, Pasfmt.OnSave;
 
 {$R *.dfm}
+
+//______________________________________________________________________________________________________________________
+
+procedure TPasfmtAddInOptions.FrameCreated(AFrame: TCustomFrame);
+begin
+  FFrame := TPasfmtSettingsFrame(AFrame);
+
+  PasfmtSettings.Load;
+  FFrame.LogLevelCombo.ItemIndex := Ord(PasfmtSettings.LogLevel);
+  FFrame.UpdateExePathControls(PasfmtSettings.ExecutablePath);
+  FFrame.OnSaveCheckBox.Checked := PasfmtSettings.FormatOnSave;
+end;
 
 //______________________________________________________________________________________________________________________
 
@@ -70,19 +84,17 @@ begin
 
     PasfmtSettings.LogLevel := TLogLevel(LogLevelOrd);
     Log.SetLogLevel(PasfmtSettings.LogLevel);
+    PasfmtSettings.FormatOnSave := FFrame.OnSaveCheckBox.Checked;
+
+    if not PasfmtSettings.FormatOnSave then begin
+      OnSaveInstaller.UninstallAll;
+    end;
   end;
 
   FFrame := nil;
 end;
 
-procedure TPasfmtAddInOptions.FrameCreated(AFrame: TCustomFrame);
-begin
-  FFrame := TPasfmtSettingsFrame(AFrame);
-
-  PasfmtSettings.Load;
-  FFrame.LogLevelCombo.ItemIndex := Ord(PasfmtSettings.LogLevel);
-  FFrame.UpdateExePathControls(PasfmtSettings.ExecutablePath);
-end;
+//______________________________________________________________________________________________________________________
 
 function TPasfmtAddInOptions.GetArea: string;
 begin

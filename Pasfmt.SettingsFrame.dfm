@@ -2,27 +2,34 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   Left = 0
   Top = 0
   Width = 390
-  Height = 180
+  Height = 242
   Constraints.MinHeight = 180
   Constraints.MinWidth = 390
   TabOrder = 0
   object LogLevelLabel: TLabel
     Left = 3
-    Top = 2
+    Top = 48
     Width = 126
     Height = 15
     Caption = 'Minimum log severity'
   end
   object ExePathLabel: TLabel
     Left = 3
-    Top = 63
+    Top = 103
     Width = 103
     Height = 15
     Caption = 'Executable location'
   end
-  object LogLevelCombo: TComboBox
+  object UserSettingsLabel: TLabel
     Left = 3
-    Top = 20
+    Top = 3
+    Width = 67
+    Height = 15
+    Caption = 'User settings'
+  end
+  object LogLevelCombo: TComboBox
+    Left = 11
+    Top = 66
     Width = 129
     Height = 23
     Style = csDropDownList
@@ -36,7 +43,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathBrowseButton: TButton
     Left = 309
-    Top = 150
+    Top = 190
     Width = 71
     Height = 23
     Caption = 'Browse...'
@@ -45,7 +52,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathRadioGroup: TRadioGroup
     Left = 3
-    Top = 66
+    Top = 103
     Width = 185
     Height = 65
     ItemIndex = 0
@@ -58,10 +65,18 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathEdit: TEdit
     Left = 29
-    Top = 127
+    Top = 167
     Width = 351
     Height = 23
     TabOrder = 1
+  end
+  object OnSaveCheckBox: TCheckBox
+    Left = 11
+    Top = 21
+    Width = 105
+    Height = 17
+    Caption = 'Format on save'
+    TabOrder = 4
   end
   object ExeChooseDialog: TOpenDialog
     Filter = 'Executable files (*.exe)|*.exe'

@@ -10,15 +10,18 @@ type
     const
       CLogLevelName = 'Log Level';
       CExecutablePathName = 'Executable Path';
+      CFormatOnSaveName = 'Format On Save';
   private
     FRegistry: TRegistry;
     FBaseKey: string;
 
     FLogLevel: TLogLevel;
     FExecutablePath: string;
+    FFormatOnSave: Boolean;
 
     procedure SetLogLevel(Value: TLogLevel);
     procedure SetExecutablePath(Value: string);
+    procedure SetFormatOnSave(Value: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -27,6 +30,7 @@ type
 
     property LogLevel: TLogLevel read FLogLevel write SetLogLevel;
     property ExecutablePath: string read FExecutablePath write SetExecutablePath;
+    property FormatOnSave: Boolean read FFormatOnSave write SetFormatOnSave;
   end;
 
 function PasfmtSettings: TPasfmtSettings;
@@ -83,6 +87,20 @@ end;
 
 //______________________________________________________________________________________________________________________
 
+procedure TPasfmtSettings.SetFormatOnSave(Value: Boolean);
+begin
+  FFormatOnSave := Value;
+
+  FRegistry.OpenKey(FBaseKey, True);
+  try
+    FRegistry.WriteBool(CFormatOnSaveName, Value);
+  finally
+    FRegistry.CloseKey;
+  end;
+end;
+
+//______________________________________________________________________________________________________________________
+
 procedure TPasfmtSettings.SetLogLevel(Value: TLogLevel);
 begin
   FLogLevel := Value;
@@ -103,6 +121,7 @@ begin
   try
     FLogLevel := llWarn;
     FExecutablePath := '';
+    FFormatOnSave := False;
 
     if FRegistry.ValueExists(CLogLevelName) then
       FLogLevel := TLogLevel(FRegistry.ReadInteger(CLogLevelName))
@@ -113,6 +132,11 @@ begin
       FExecutablePath := FRegistry.ReadString(CExecutablePathName)
     else
       FRegistry.WriteString(CExecutablePathName, FExecutablePath);
+
+    if FRegistry.ValueExists(CFormatOnSaveName) then
+      FFormatOnSave := FRegistry.ReadBool(CFormatOnSaveName)
+    else
+      FRegistry.WriteBool(CFormatOnSaveName, FFormatOnSave);
   finally
     FRegistry.CloseKey;
   end;
