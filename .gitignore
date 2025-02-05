@@ -7,5 +7,8 @@ Win32/
 *.identcache
 *.res
 *.dsk
+*.rc
+*.dres
+*.res
 __history/
 __recovery/
