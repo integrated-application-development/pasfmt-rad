@@ -16,6 +16,8 @@ uses
     Vcl.Menus,
     Vcl.ActnList,
     Pasfmt.FormatEditor,
+    Pasfmt.SettingsFrame,
+    Pasfmt.Settings,
     Winapi.Windows,
     System.JSON,
     Vcl.Dialogs;
@@ -26,11 +28,13 @@ type
     FPasfmtMenu: TMenuItem;
     FKeyboardBindingIndex: Integer;
     FInfoIndex: Integer;
+    FAddInOptions: TPasfmtAddInOptions;
 
     function GetPluginVersion: string;
 
     procedure FormatKeyBinding(const Context: IOTAKeyContext; KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
     procedure OnFormatActionExecute(Sender: TObject);
+    procedure OnSettingsActionExecute(Sender: TObject);
     procedure Format;
   public
     constructor Create;
@@ -89,6 +93,8 @@ begin
   (BorlandIDEServices as INTAServices).AddActionMenu('ToolsMenu', nil, FPasfmtMenu);
   FKeyboardBindingIndex :=
       (BorlandIDEServices as IOTAKeyboardServices).AddKeyboardBinding(TPasfmtKeyboardBinding.Create);
+  FAddInOptions := TPasfmtAddInOptions.Create;
+  (BorlandIDEServices as INTAEnvironmentOptionsServices).RegisterAddInOptions(FAddInOptions);
 
   PluginName := 'Pasfmt for RAD Studio v' + GetPluginVersion;
 
@@ -110,10 +116,10 @@ end;
 destructor TPlugin.Destroy;
 begin
   (BorlandIDEServices as IOTAAboutBoxServices).RemovePluginInfo(FInfoIndex);
+  (BorlandIDEServices as INTAEnvironmentOptionsServices).UnregisterAddInOptions(FAddInOptions);
   (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
   FreeAndNil(FPasfmtMenu);
   inherited;
-
 end;
 
 //______________________________________________________________________________________________________________________
@@ -123,12 +129,18 @@ var
   Formatter: TEditViewFormatter;
 begin
   Formatter := Default(TEditViewFormatter);
+  Formatter.Formatter.Executable := PasfmtSettings.ExecutablePath;
   Formatter.Format((BorlandIDEServices as IOTAEditorServices).TopView.Buffer);
 end;
 
 procedure TPlugin.OnFormatActionExecute(Sender: TObject);
 begin
   Format;
+end;
+
+procedure TPlugin.OnSettingsActionExecute(Sender: TObject);
+begin
+  (BorlandIDEServices as IOTAServices).GetEnvironmentOptions.EditOptions('', 'Pasfmt');
 end;
 
 procedure TPlugin

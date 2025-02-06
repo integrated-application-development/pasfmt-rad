@@ -38,6 +38,8 @@ contains
   Pasfmt.Subprocess in 'Pasfmt.Subprocess.pas',
   Pasfmt.FormatCore in 'Pasfmt.FormatCore.pas',
   Pasfmt.FormatEditor in 'Pasfmt.FormatEditor.pas',
-  Pasfmt.Log in 'Pasfmt.Log.pas';
+  Pasfmt.Log in 'Pasfmt.Log.pas',
+  Pasfmt.Settings in 'Pasfmt.Settings.pas',
+  Pasfmt.SettingsFrame in 'Pasfmt.SettingsFrame.pas' {PasfmtSettingsFrame: TFrame};
 
 end.

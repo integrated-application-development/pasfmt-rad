@@ -1,9 +1,9 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Base>True</Base>
         <AppType>Package</AppType>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>VCL</FrameworkType>
         <MainSource>Pasfmt.dpk</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{5B79110C-4DE7-4913-8685-8C1C2B22ED1D}</ProjectGuid>
@@ -97,6 +97,12 @@
         <DCCReference Include="Pasfmt.FormatCore.pas"/>
         <DCCReference Include="Pasfmt.FormatEditor.pas"/>
         <DCCReference Include="Pasfmt.Log.pas"/>
+        <DCCReference Include="Pasfmt.Settings.pas"/>
+        <DCCReference Include="Pasfmt.SettingsFrame.pas">
+            <Form>PasfmtSettingsFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <RcItem Include="version.json">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
