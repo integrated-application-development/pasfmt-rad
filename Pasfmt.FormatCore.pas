@@ -13,6 +13,7 @@ type
   TFormatter = record
     Executable: string;
     WorkingDirectory: string;
+    Timeout: Integer;
     function Format(Input: UTF8String; Cursors: TArray<Integer>): TFormatResult;
   end;
 
@@ -98,7 +99,7 @@ begin
       System.SysUtils.Format('"%s" -C encoding=utf-8 --cursor=%s', [EffectiveExe, SerializeCursors(Cursors)]);
 
   Result := Default(TFormatResult);
-  Result.ExitCode := RunProcess(CommandLine, Input, Result.Output, StdErr, WorkingDirectory, 500);
+  Result.ExitCode := RunProcess(CommandLine, Input, Result.Output, StdErr, WorkingDirectory, Timeout);
   Result.ErrorInfo := ExtractCursorTag(Trim(string(StdErr)), CursorTagValue);
   Result.Cursors := DeserializeCursors(CursorTagValue);
 end;

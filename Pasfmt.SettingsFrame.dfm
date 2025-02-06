@@ -2,7 +2,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   Left = 0
   Top = 0
   Width = 390
-  Height = 242
+  Height = 334
   Constraints.MinHeight = 180
   Constraints.MinWidth = 390
   TabOrder = 0
@@ -15,7 +15,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathLabel: TLabel
     Left = 3
-    Top = 103
+    Top = 159
     Width = 103
     Height = 15
     Caption = 'Executable location'
@@ -26,6 +26,13 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
     Width = 67
     Height = 15
     Caption = 'User settings'
+  end
+  object TimeoutLabel: TLabel
+    Left = 3
+    Top = 104
+    Width = 110
+    Height = 15
+    Caption = 'Format timeout (ms)'
   end
   object LogLevelCombo: TComboBox
     Left = 11
@@ -43,7 +50,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathBrowseButton: TButton
     Left = 309
-    Top = 190
+    Top = 246
     Width = 71
     Height = 23
     Caption = 'Browse...'
@@ -52,7 +59,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathRadioGroup: TRadioGroup
     Left = 3
-    Top = 103
+    Top = 159
     Width = 185
     Height = 65
     ItemIndex = 0
@@ -65,7 +72,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathEdit: TEdit
     Left = 29
-    Top = 167
+    Top = 223
     Width = 351
     Height = 23
     TabOrder = 1
@@ -77,6 +84,17 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
     Height = 17
     Caption = 'Format on save'
     TabOrder = 4
+  end
+  object TimeoutEdit: TEdit
+    Left = 11
+    Top = 122
+    Width = 129
+    Height = 23
+    NumbersOnly = True
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 5
+    Text = '500'
   end
   object ExeChooseDialog: TOpenDialog
     Filter = 'Executable files (*.exe)|*.exe'

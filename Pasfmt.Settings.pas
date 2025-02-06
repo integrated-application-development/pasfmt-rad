@@ -11,6 +11,7 @@ type
       CLogLevelName = 'Log Level';
       CExecutablePathName = 'Executable Path';
       CFormatOnSaveName = 'Format On Save';
+      CFormatTimeoutName = 'Format Timeout';
   private
     FRegistry: TRegistry;
     FBaseKey: string;
@@ -18,10 +19,12 @@ type
     FLogLevel: TLogLevel;
     FExecutablePath: string;
     FFormatOnSave: Boolean;
+    FFormatTimeout: Integer;
 
     procedure SetLogLevel(Value: TLogLevel);
     procedure SetExecutablePath(Value: string);
     procedure SetFormatOnSave(Value: Boolean);
+    procedure SetFormatTimeout(Value: Integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -31,6 +34,7 @@ type
     property LogLevel: TLogLevel read FLogLevel write SetLogLevel;
     property ExecutablePath: string read FExecutablePath write SetExecutablePath;
     property FormatOnSave: Boolean read FFormatOnSave write SetFormatOnSave;
+    property FormatTimeout: Integer read FFormatTimeout write SetFormatTimeout;
   end;
 
 function PasfmtSettings: TPasfmtSettings;
@@ -101,6 +105,20 @@ end;
 
 //______________________________________________________________________________________________________________________
 
+procedure TPasfmtSettings.SetFormatTimeout(Value: Integer);
+begin
+  FFormatTimeout := Value;
+
+  FRegistry.OpenKey(FBaseKey, True);
+  try
+    FRegistry.WriteInteger(CFormatTimeoutName, Value);
+  finally
+    FRegistry.CloseKey;
+  end;
+end;
+
+//______________________________________________________________________________________________________________________
+
 procedure TPasfmtSettings.SetLogLevel(Value: TLogLevel);
 begin
   FLogLevel := Value;
@@ -122,6 +140,7 @@ begin
     FLogLevel := llWarn;
     FExecutablePath := '';
     FFormatOnSave := False;
+    FFormatTimeout := 500;
 
     if FRegistry.ValueExists(CLogLevelName) then
       FLogLevel := TLogLevel(FRegistry.ReadInteger(CLogLevelName))
@@ -137,6 +156,11 @@ begin
       FFormatOnSave := FRegistry.ReadBool(CFormatOnSaveName)
     else
       FRegistry.WriteBool(CFormatOnSaveName, FFormatOnSave);
+
+    if FRegistry.ValueExists(CFormatTimeoutName) then
+      FFormatTimeout := FRegistry.ReadInteger(CFormatTimeoutName)
+    else
+      FRegistry.WriteInteger(CFormatTimeoutName, FFormatTimeout);
   finally
     FRegistry.CloseKey;
   end;

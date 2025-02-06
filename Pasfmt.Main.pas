@@ -138,6 +138,7 @@ var
   Project: IOTAProject;
 begin
   Formatter.Core.Executable := PasfmtSettings.ExecutablePath;
+  Formatter.Core.Timeout := PasfmtSettings.FormatTimeout;
 
   Project := (BorlandIDEServices as IOTAModuleServices).GetActiveProject;
   if Assigned(Project) then begin

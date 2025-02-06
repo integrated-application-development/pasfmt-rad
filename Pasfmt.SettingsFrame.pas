@@ -1,4 +1,4 @@
-unit Pasfmt.SettingsFrame;
+﻿unit Pasfmt.SettingsFrame;
 
 interface
 
@@ -16,7 +16,8 @@ uses
     Vcl.StdCtrls,
     Vcl.Mask,
     Vcl.ExtCtrls,
-    Vcl.Buttons;
+    Vcl.Buttons,
+    Vcl.NumberBox;
 
 type
   TPasfmtSettingsFrame = class(TFrame)
@@ -29,6 +30,8 @@ type
     ExePathLabel: TLabel;
     OnSaveCheckBox: TCheckBox;
     UserSettingsLabel: TLabel;
+    TimeoutLabel: TLabel;
+    TimeoutEdit: TEdit;
     procedure ExePathBrowseButtonClick(Sender: TObject);
     procedure ExePathRadioGroupClick(Sender: TObject);
   public
@@ -66,6 +69,7 @@ begin
   FFrame.LogLevelCombo.ItemIndex := Ord(PasfmtSettings.LogLevel);
   FFrame.UpdateExePathControls(PasfmtSettings.ExecutablePath);
   FFrame.OnSaveCheckBox.Checked := PasfmtSettings.FormatOnSave;
+  FFrame.TimeoutEdit.Text := IntToStr(PasfmtSettings.FormatTimeout);
 end;
 
 //______________________________________________________________________________________________________________________
@@ -73,9 +77,14 @@ end;
 procedure TPasfmtAddInOptions.DialogClosed(Accepted: Boolean);
 var
   LogLevelOrd: Integer;
+  NewTimeout: Integer;
 begin
   if Accepted then begin
     PasfmtSettings.ExecutablePath := IfThen(FFrame.ExePathRadioGroup.ItemIndex = 1, Trim(FFrame.ExePathEdit.Text), '');
+
+    if TryStrToInt(FFrame.TimeoutEdit.Text, NewTimeout) then begin
+      PasfmtSettings.FormatTimeout := NewTimeout;
+    end;
 
     LogLevelOrd := FFrame.LogLevelCombo.ItemIndex;
     if (LogLevelOrd < 0) or (LogLevelOrd > Ord(High(TLogLevel))) then begin
