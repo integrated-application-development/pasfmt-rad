@@ -28,7 +28,7 @@ function RunWinProcess(
 
 implementation
 
-uses System.Classes, System.SysUtils;
+uses System.Classes, System.SysUtils, Pasfmt.Log;
 
 type
   TOutputPipeThread = class(TThread)
@@ -155,6 +155,7 @@ begin
   StartupInfo.hStdOutput := StdOutPipeWrite;
   StartupInfo.hStdError := StdErrPipeWrite;
 
+  Log.Debug('subprocess started at %s', [FormatDateTime('hh:mm:ss.zzz', Now)]);
   ProcHandle :=
       CreateProcess(nil, PChar(CommandLine), nil, nil, True, 0, nil, PChar(WorkingDirectory), StartupInfo, ProcessInfo);
 
@@ -173,20 +174,22 @@ begin
     StdOutThread := TOutputPipeThread.Create(StdOutPipeRead, StdOut, 'stdout');
     StdErrThread := TOutputPipeThread.Create(StdErrPipeRead, StdErr, 'stderr');
     try
-      Assert(StdInThread.WaitFor = 0);
-      Assert(StdOutThread.WaitFor = 0);
-      Assert(StdErrThread.WaitFor = 0);
-
       case WaitForSingleObject(ProcessInfo.hProcess, TimeoutMillis) of
         WAIT_TIMEOUT: begin
           raise Exception.CreateFmt('subprocess timed out after %d ms: %s', [TimeoutMillis, CommandLine]);
         end;
         WAIT_FAILED: RaiseLastOSError;
       else
-        Assert(GetExitCodeProcess(ProcessInfo.hProcess, Result));
+        if not GetExitCodeProcess(ProcessInfo.hProcess, Result) then
+          RaiseLastOSError;
       end;
 
+      Log.Debug('subprocess finished at %s', [FormatDateTime('hh:mm:ss.zzz', Now)]);
     finally
+      StdInThread.WaitFor;
+      StdOutThread.WaitFor;
+      StdErrThread.WaitFor;
+
       FreeAndNil(StdInThread);
       FreeAndNil(StdOutThread);
       FreeAndNil(StdErrThread);
