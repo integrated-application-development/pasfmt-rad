@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Base>True</Base>
         <AppType>Package</AppType>
@@ -97,6 +97,11 @@
         <DCCReference Include="Pasfmt.FormatCore.pas"/>
         <DCCReference Include="Pasfmt.FormatEditor.pas"/>
         <DCCReference Include="Pasfmt.Log.pas"/>
+        <RcItem Include="version.json">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>VERSIONJSON</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
