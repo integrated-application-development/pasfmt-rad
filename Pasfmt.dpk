@@ -34,6 +34,8 @@ requires
 contains
   Pasfmt.Main in 'Pasfmt.Main.pas',
   Pasfmt.WinExec in 'Pasfmt.WinExec.pas',
-  Pasfmt.Subprocess in 'Pasfmt.Subprocess.pas';
+  Pasfmt.Subprocess in 'Pasfmt.Subprocess.pas',
+  Pasfmt.FormatCore in 'Pasfmt.FormatCore.pas',
+  Pasfmt.FormatEditor in 'Pasfmt.FormatEditor.pas';
 
 end.

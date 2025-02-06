@@ -2,152 +2,139 @@
 
 interface
 
-type
-  TPlugin = class
-    procedure Format(Sender: TObject);
-  end;
-
 procedure Register;
 
 implementation
 
-uses Pasfmt.Subprocess, System.Classes, ToolsAPI, Winapi.ActiveX, Vcl.AxCtrls, System.SysUtils, Vcl.Menus, Vcl.ActnList;
+uses
+    Pasfmt.Subprocess,
+    System.Classes,
+    ToolsAPI,
+    Winapi.ActiveX,
+    Vcl.AxCtrls,
+    System.SysUtils,
+    Vcl.Menus,
+    Vcl.ActnList,
+    Pasfmt.FormatEditor,
+    Vcl.Dialogs;
+
+type
+  TPlugin = class(TObject)
+  private
+    FPasfmtMenu: TMenuItem;
+    FKeyboardBindingIndex: Integer;
+
+    procedure FormatKeyBinding(const Context: IOTAKeyContext; KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+    procedure FormatEvent(Sender: TObject);
+    procedure Format;
+  public
+    constructor Create;
+    destructor Destroy; override;
+  end;
+
+  TPasfmtKeyboardBinding = class(TNotifierObject, IOTAKeyboardBinding)
+  public
+    function GetBindingType: TBindingType;
+    function GetDisplayName: string;
+    function GetName: string;
+    procedure BindKeyboard(const BindingServices: IOTAKeyBindingServices);
+  end;
 
 var
   GPlugin: TPlugin;
-  GPasfmtMenu: TMenuItem;
+
+  //______________________________________________________________________________________________________________________
 
 procedure Register;
-var
-  FormatItem: TMenuItem;
-  FormatAction: TAction;
 begin
   GPlugin := TPlugin.Create;
+end;
 
-  GPasfmtMenu := TMenuItem.Create((BorlandIDEServices as INTAServices).MainMenu);
-  GPasfmtMenu.Caption := 'Pasf&mt';
+//______________________________________________________________________________________________________________________
 
-  FormatAction := TAction.Create(GPasfmtMenu);
+constructor TPlugin.Create;
+var
+  FormatAction: TAction;
+  FormatItem: TMenuItem;
+begin
+  FPasfmtMenu := TMenuItem.Create((BorlandIDEServices as INTAServices).MainMenu);
+  FPasfmtMenu.Caption := 'Pasf&mt';
+
+  FormatAction := TAction.Create(FPasfmtMenu);
   FormatAction.Caption := '&Format';
-  FormatAction.Category := 'pasfmt';
-  FormatAction.OnExecute := GPlugin.Format;
+  FormatAction.Category := 'Pasfmt';
+  FormatAction.OnExecute := FormatEvent;
 
-  FormatItem := TMenuItem.Create(GPasfmtMenu);
+  FormatItem := TMenuItem.Create(FPasfmtMenu);
+  FormatItem.Name := 'PasfmtFormatItem';
   FormatItem.Action := FormatAction;
-  GPasfmtMenu.Add(FormatItem);
+  FPasfmtMenu.Add(FormatItem);
+
   (BorlandIDEServices as INTAServices).AddActionMenu('', FormatAction, nil);
-
-  (BorlandIDEServices as INTAServices).AddActionMenu('ToolsMenu', nil, GPasfmtMenu);
+  (BorlandIDEServices as INTAServices).AddActionMenu('ToolsMenu', nil, FPasfmtMenu);
+  FKeyboardBindingIndex :=
+      (BorlandIDEServices as IOTAKeyboardServices).AddKeyboardBinding(TPasfmtKeyboardBinding.Create);
 end;
 
-function StreamToUTF8(Stream: IStream): UTF8String;
+//______________________________________________________________________________________________________________________
+
+destructor TPlugin.Destroy;
+begin
+  (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
+  FreeAndNil(FPasfmtMenu);
+  inherited;
+
+end;
+
+//______________________________________________________________________________________________________________________
+
+procedure TPlugin.Format;
 var
-  OleStream: TOleStream;
+  Formatter: TEditViewFormatter;
 begin
-  OleStream := TOleStream.Create(Stream);
-  try
-    SetLength(Result, OleStream.Size);
-    OleStream.Seek(0, soBeginning);
-    if OleStream.Read(Result[1], Length(Result)) <> OleStream.Size then
-      raise Exception.Create('The stream could not be read');
-  finally
-    OleStream.Free;
-  end;
+  Formatter := Default(TEditViewFormatter);
+  Formatter.Format((BorlandIDEServices as IOTAEditorServices).TopView.Buffer);
 end;
 
-procedure FormatView(EditView: IOTAEditView);
-
-  function ParseCursorOffset(const Data: UTF8String): Integer;
-  const
-    CTag: UTF8String = 'CURSOR=';
-  var
-    TagPos: Integer;
-    NumPos: Integer;
-    NumLength: Integer;
-  begin
-    TagPos := System.Pos(CTag, Data);
-    if TagPos > 0 then begin
-      NumLength := 0;
-      NumPos := TagPos + Length(CTag);
-      while (NumPos + NumLength <= Length(Data)) and (Data[NumPos + NumLength] in [#$30..#$39]) do
-        Inc(NumLength);
-
-      if not TryStrToInt(string(System.Copy(Data, NumPos, NumLength)), Result) then
-        Result := -1;
-    end;
-  end;
-
-  procedure TrimTrailingNewlines(Data: PAnsiChar; Length: Integer);
-  var
-    StrEnd: PAnsiChar;
-  begin
-    StrEnd := Data + Length;
-    while (StrEnd > Data) and ((StrEnd - 1)^ in [#$0A, #$0D]) do
-      Dec(StrEnd);
-    StrEnd^ := #0;
-  end;
-
-var
-  SourceEditor: IOTAEditorContent;
-  EditPos: TOTAEditPos;
-  CharPos: TOTACharPos;
-  BytePos: Integer;
-
-  CommandLine: string;
-  StdIn: UTF8String;
-  StdOut: UTF8String;
-  StdErr: UTF8String;
-  ExitCode: Cardinal;
-
-  NewCursorOffset: Integer;
-  Writer: IOTAEditWriter;
+procedure TPlugin.FormatEvent(Sender: TObject);
 begin
-  if EditView.Buffer.QueryInterface(IOTAEditorContent, SourceEditor) = S_OK then begin
-    StdIn := StreamToUTF8(SourceEditor.Content);
-  end
-  else begin
-    raise Exception.Create('Editor doesn''t support IOTAEditorContent');
-  end;
-
-  EditPos := EditView.CursorPos;
-  EditView.ConvertPos(True, EditPos, CharPos);
-  BytePos := EditView.CharPosToPos(CharPos);
-
-  CommandLine := 'pasfmt.exe -C encoding=utf-8 --cursor=' + IntToStr(BytePos);
-  ExitCode := RunProcess(CommandLine, StdIn, StdOut, StdErr, 1);
-
-  Assert(ExitCode = 0);
-
-  Writer := EditView.Buffer.CreateUndoableWriter;
-  Writer.DeleteTo(MaxInt);
-  // the IDE always inserts a line ending after whatever we insert, so we have to trim the trailing line ending
-  // that pasfmt creates.
-  TrimTrailingNewlines(PAnsiChar(StdOut), Length(StdOut));
-  // While it would possible to insert with this Writer incrementally as stdout is consumed from the subprocess
-  // (avoiding collecting the entire output into a string), using this method from a thread other than the main thread
-  // either hangs or breaks things. I think this is the fault of the VCL components.
-  // Also, if you call this method more than once than the scroll position of the editor is ruined.
-  Writer.Insert(PAnsiChar(StdOut));
-
-  NewCursorOffset := ParseCursorOffset(StdErr);
-  if NewCursorOffset > 0 then begin
-    CharPos := EditView.PosToCharPos(NewCursorOffset);
-    EditView.ConvertPos(False, EditPos, CharPos);
-    EditView.CursorPos := EditPos;
-  end;
-
-  EditView.Paint;
+  Format;
 end;
 
-procedure TPlugin.Format(Sender: TObject);
+procedure TPlugin
+    .FormatKeyBinding(const Context: IOTAKeyContext; KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
-  FormatView((BorlandIDEServices as IOTAEditorServices).TopView);
+  Format;
 end;
+
+//______________________________________________________________________________________________________________________
+
+procedure TPasfmtKeyboardBinding.BindKeyboard(const BindingServices: IOTAKeyBindingServices);
+begin
+  BindingServices
+      .AddKeyBinding([ShortCut(Ord('F'), [ssCtrl, ssAlt])], GPlugin.FormatKeyBinding, nil, 0, '', 'PasfmtFormatItem');
+end;
+
+function TPasfmtKeyboardBinding.GetBindingType: TBindingType;
+begin
+  Result := btPartial;
+end;
+
+function TPasfmtKeyboardBinding.GetDisplayName: string;
+begin
+  Result := 'Pasfmt Keyboard Bindings';
+end;
+
+function TPasfmtKeyboardBinding.GetName: string;
+begin
+  Result := 'PasfmtBindings';
+end;
+
+//______________________________________________________________________________________________________________________
 
 initialization
 
 finalization
   FreeAndNil(GPlugin);
-  FreeAndNil(GPasfmtMenu);
 
 end.
