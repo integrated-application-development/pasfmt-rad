@@ -97,7 +97,7 @@ begin
       System.SysUtils.Format('"%s" -C encoding=utf-8 --cursor=%s', [EffectiveExe, SerializeCursors(Cursors)]);
 
   Result := Default(TFormatResult);
-  Result.ExitCode := RunProcess(CommandLine, Input, Result.Output, StdErr, 1);
+  Result.ExitCode := RunProcess(CommandLine, Input, Result.Output, StdErr, 500);
   Result.ErrorInfo := ExtractCursorTag(string(StdErr), CursorTagValue);
   Result.Cursors := DeserializeCursors(CursorTagValue);
 end;

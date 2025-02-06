@@ -179,7 +179,7 @@ begin
 
       case WaitForSingleObject(ProcessInfo.hProcess, TimeoutMillis) of
         WAIT_TIMEOUT: begin
-          raise Exception.CreateFmt('subprocess timed out after %d seconds: %s', [TimeoutMillis, CommandLine]);
+          raise Exception.CreateFmt('subprocess timed out after %d ms: %s', [TimeoutMillis, CommandLine]);
         end;
         WAIT_FAILED: RaiseLastOSError;
       else
