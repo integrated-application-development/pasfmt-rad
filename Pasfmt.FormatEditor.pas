@@ -46,6 +46,10 @@ procedure TrimTrailingNewlines(Data: PAnsiChar; Length: Integer);
 var
   StrEnd: PAnsiChar;
 begin
+  if Data = nil then begin
+    Exit;
+  end;
+
   StrEnd := Data + Length;
   while (StrEnd > Data) and ((StrEnd - 1)^ in [#$0A, #$0D]) do
     Dec(StrEnd);
@@ -126,7 +130,16 @@ begin
   SetBufferViewMessages(Buffer, 'Formatting...');
 
   EditorContent := StreamToUTF8(SourceEditor.Content);
-  FormatResult := Core.Format(EditorContent, GetBufferViewCursors(Buffer));
+
+  try
+    FormatResult := Core.Format(EditorContent, GetBufferViewCursors(Buffer));
+  except
+    on E: Exception do begin
+      Log.Error('Format invocation failed: %s', [E.Message]);
+      SetBufferViewMessages(Buffer, 'Format error');
+      Exit;
+    end;
+  end;
 
   if FormatResult.ErrorInfo <> '' then begin
     if ContainsText(FormatResult.ErrorInfo, 'error') then begin
