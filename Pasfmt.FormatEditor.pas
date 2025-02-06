@@ -13,7 +13,15 @@ type
 
 implementation
 
-uses System.SysUtils, System.Classes, Winapi.Windows, Winapi.ActiveX, Vcl.AxCtrls;
+uses
+    System.SysUtils,
+    System.Classes,
+    Winapi.Windows,
+    Winapi.ActiveX,
+    Vcl.AxCtrls,
+    Pasfmt.Log,
+    Vcl.Dialogs,
+    System.StrUtils;
 
 //______________________________________________________________________________________________________________________
 
@@ -103,7 +111,23 @@ begin
   end;
 
   FormatResult := Formatter.Format(EditorContent, GetBufferViewCursors(Buffer));
-  Assert(FormatResult.ExitCode = 0);
+
+  if FormatResult.ErrorInfo <> '' then begin
+    if ContainsText(FormatResult.ErrorInfo, 'error') then begin
+      Log.Error(FormatResult.ErrorInfo);
+    end
+    else begin
+      Log.Warn(FormatResult.ErrorInfo);
+    end;
+  end;
+  if FormatResult.ExitCode <> 0 then begin
+    Log.Error('Format of "%s" failed', [Buffer.FileName]);
+    Exit;
+  end;
+  if FormatResult.Output = EditorContent then begin
+    Log.Debug('"%s" is already formatted, skipping buffer update', [Buffer.FileName]);
+    Exit;
+  end;
 
   Writer := Buffer.CreateUndoableWriter;
   Writer.DeleteTo(MaxInt);
@@ -117,6 +141,8 @@ begin
   Writer.Insert(PAnsiChar(FormatResult.Output));
 
   SetBufferViewCursors(Buffer, FormatResult.Cursors);
+
+  Log.Debug('Formatted "%s", %d cursors updated', [Buffer.FileName, Length(FormatResult.Cursors)]);
 end;
 
 //______________________________________________________________________________________________________________________

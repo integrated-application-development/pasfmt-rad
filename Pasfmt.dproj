@@ -96,6 +96,7 @@
         <DCCReference Include="Pasfmt.Subprocess.pas"/>
         <DCCReference Include="Pasfmt.FormatCore.pas"/>
         <DCCReference Include="Pasfmt.FormatEditor.pas"/>
+        <DCCReference Include="Pasfmt.Log.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

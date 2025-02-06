@@ -98,7 +98,7 @@ begin
 
   Result := Default(TFormatResult);
   Result.ExitCode := RunProcess(CommandLine, Input, Result.Output, StdErr, 500);
-  Result.ErrorInfo := ExtractCursorTag(string(StdErr), CursorTagValue);
+  Result.ErrorInfo := ExtractCursorTag(Trim(string(StdErr)), CursorTagValue);
   Result.Cursors := DeserializeCursors(CursorTagValue);
 end;
 

@@ -36,6 +36,7 @@ contains
   Pasfmt.WinExec in 'Pasfmt.WinExec.pas',
   Pasfmt.Subprocess in 'Pasfmt.Subprocess.pas',
   Pasfmt.FormatCore in 'Pasfmt.FormatCore.pas',
-  Pasfmt.FormatEditor in 'Pasfmt.FormatEditor.pas';
+  Pasfmt.FormatEditor in 'Pasfmt.FormatEditor.pas',
+  Pasfmt.Log in 'Pasfmt.Log.pas';
 
 end.
