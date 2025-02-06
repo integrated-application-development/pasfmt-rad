@@ -46,7 +46,9 @@
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <DCC_DcpOutput>.\$(Platform)\$(Config)</DCC_DcpOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_Description>Pasfmt for RAD Studio</DCC_Description>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DesignOnlyPackage>true</DesignOnlyPackage>
         <GenDll>true</GenDll>
         <GenPackage>true</GenPackage>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
