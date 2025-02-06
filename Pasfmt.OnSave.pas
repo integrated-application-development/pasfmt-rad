@@ -2,7 +2,7 @@
 
 interface
 
-uses ToolsAPI, System.Classes, Vcl.Forms, DockForm, System.Generics.Collections, Pasfmt.FormatEditor;
+uses ToolsAPI, System.Classes, DockForm, System.Generics.Collections, Pasfmt.FormatEditor;
 
 type
   TConfigureFormatterProc = reference to procedure(var Formatter: TEditBufferFormatter);

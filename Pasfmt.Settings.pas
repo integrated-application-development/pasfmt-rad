@@ -46,8 +46,6 @@ uses ToolsAPI, System.SysUtils, Winapi.Windows;
 var
   GSettings: TPasfmtSettings;
 
-  //______________________________________________________________________________________________________________________
-
 function PasfmtSettings: TPasfmtSettings;
 begin
   if not Assigned(GSettings) then begin

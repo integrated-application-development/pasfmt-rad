@@ -7,15 +7,11 @@ procedure Register;
 implementation
 
 uses
-    Pasfmt.Subprocess,
     System.Classes,
     ToolsAPI,
-    Winapi.ActiveX,
-    Vcl.AxCtrls,
     System.SysUtils,
     Vcl.Menus,
     Vcl.ActnList,
-    Pasfmt.FormatCore,
     Pasfmt.FormatEditor,
     Pasfmt.SettingsFrame,
     Pasfmt.Settings,
@@ -23,8 +19,7 @@ uses
     System.JSON,
     Pasfmt.Log,
     Pasfmt.OnSave,
-    System.IOUtils,
-    Vcl.Dialogs;
+    System.IOUtils;
 
 type
   TPlugin = class(TObject)

@@ -2,22 +2,7 @@
 
 interface
 
-uses
-    Winapi.Windows,
-    Winapi.Messages,
-    System.SysUtils,
-    System.Variants,
-    System.Classes,
-    Vcl.Graphics,
-    Vcl.Controls,
-    Vcl.Forms,
-    Vcl.Dialogs,
-    ToolsAPI,
-    Vcl.StdCtrls,
-    Vcl.Mask,
-    Vcl.ExtCtrls,
-    Vcl.Buttons,
-    Vcl.NumberBox;
+uses System.Classes, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ToolsAPI, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TPasfmtSettingsFrame = class(TFrame)
@@ -55,7 +40,7 @@ type
 
 implementation
 
-uses System.IOUtils, Pasfmt.Settings, Pasfmt.Log, System.StrUtils, Pasfmt.OnSave;
+uses System.IOUtils, Pasfmt.Settings, Pasfmt.Log, System.StrUtils, Pasfmt.OnSave, System.SysUtils;
 
 {$R *.dfm}
 

@@ -13,15 +13,7 @@ type
 
 implementation
 
-uses
-    System.SysUtils,
-    System.Classes,
-    Winapi.Windows,
-    Winapi.ActiveX,
-    Vcl.AxCtrls,
-    Pasfmt.Log,
-    Vcl.Dialogs,
-    System.StrUtils;
+uses System.SysUtils, System.Classes, Winapi.ActiveX, Vcl.AxCtrls, Pasfmt.Log, System.StrUtils;
 
 //______________________________________________________________________________________________________________________
 
