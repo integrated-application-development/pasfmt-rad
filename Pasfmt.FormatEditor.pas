@@ -104,6 +104,9 @@ end;
 //______________________________________________________________________________________________________________________
 
 procedure TEditBufferFormatter.Format(Buffer: IOTAEditBuffer);
+const
+  CSuccessMsg = 'Formatted ✓';
+  CErrMsg = 'Format error';
 var
   SourceEditor: IOTAEditorContent;
   EditorContent: UTF8String;
@@ -128,7 +131,7 @@ begin
   except
     on E: Exception do begin
       Log.Error('Format invocation failed: %s', [E.Message]);
-      SetBufferViewMessages(Buffer, 'Format error');
+      SetBufferViewMessages(Buffer, CErrMsg);
       Exit;
     end;
   end;
@@ -143,16 +146,17 @@ begin
   end;
   if FormatResult.ExitCode <> 0 then begin
     Log.Error('Format of "%s" failed', [Buffer.FileName]);
-    SetBufferViewMessages(Buffer, 'Format error');
+    SetBufferViewMessages(Buffer, CErrMsg);
     Exit;
   end;
 
-  SetBufferViewMessages(Buffer, 'Formatted ✓');
-
   if FormatResult.Output = EditorContent then begin
+    SetBufferViewMessages(Buffer, CSuccessMsg);
     Log.Debug('"%s" is already formatted, skipping buffer update', [Buffer.FileName]);
     Exit;
   end;
+
+  SetBufferViewMessages(Buffer, 'Rendering...');
 
   Writer := Buffer.CreateUndoableWriter;
   Writer.DeleteTo(MaxInt);
@@ -168,6 +172,7 @@ begin
   SetBufferViewCursors(Buffer, FormatResult.Cursors);
 
   Log.Debug('Formatted "%s", %d cursors updated', [Buffer.FileName, Length(FormatResult.Cursors)]);
+  SetBufferViewMessages(Buffer, CSuccessMsg);
 end;
 
 //______________________________________________________________________________________________________________________
