@@ -50,26 +50,34 @@ end;
 
 //______________________________________________________________________________________________________________________
 
-function GetBufferViewCursors(Buffer: IOTAEditBuffer): TArray<Integer>;
+type
+  TCursors = record
+    Offsets: TArray<Integer>;
+    Rows: TArray<Integer>;
+  end;
+
+function GetBufferViewCursors(Buffer: IOTAEditBuffer): TCursors;
 var
   I: Integer;
   EditView: IOTAEditView;
   EditPos: TOTAEditPos;
   CharPos: TOTACharPos;
 begin
-  SetLength(Result, Buffer.EditViewCount);
+  SetLength(Result.Offsets, Buffer.EditViewCount);
+  SetLength(Result.Rows, Buffer.EditViewCount);
   for I := 0 to Buffer.EditViewCount - 1 do begin
     EditView := Buffer.EditViews[I];
 
     EditPos := EditView.CursorPos;
     EditView.ConvertPos(True, EditPos, CharPos);
-    Result[I] := EditView.CharPosToPos(CharPos);
+    Result.Offsets[I] := EditView.CharPosToPos(CharPos);
+    Result.Rows[I] := EditView.Position.Row;
   end;
 end;
 
 //______________________________________________________________________________________________________________________
 
-procedure SetBufferViewCursors(Buffer: IOTAEditBuffer; Cursors: TArray<Integer>);
+procedure SetBufferViewCursors(Buffer: IOTAEditBuffer; Cursors: TCursors);
 var
   I: Integer;
   EditView: IOTAEditView;
@@ -77,15 +85,16 @@ var
   CharPos: TOTACharPos;
 begin
   for I := 0 to Buffer.EditViewCount - 1 do begin
-    if (I >= Length(Cursors)) or (Cursors[I] < 0) then begin
+    if (I >= Length(Cursors.Offsets)) or (Cursors.Offsets[I] < 0) then begin
       Continue;
     end;
 
     EditView := Buffer.EditViews[I];
 
-    CharPos := EditView.PosToCharPos(Cursors[I]);
+    CharPos := EditView.PosToCharPos(Cursors.Offsets[I]);
     EditView.ConvertPos(False, EditPos, CharPos);
     EditView.CursorPos := EditPos;
+    EditView.Scroll(CharPos.Line - Cursors.Rows[I], 0);
     EditView.Paint;
   end;
 end;
@@ -109,6 +118,7 @@ var
   EditorContent: UTF8String;
   FormatResult: TFormatResult;
   Writer: IOTAEditWriter;
+  Cursors: TCursors;
 begin
   if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
     Log.Debug('Format request ignored: the editor is not formattable', [Buffer.FileName]);
@@ -122,9 +132,10 @@ begin
   SetBufferViewMessages(Buffer, 'Formatting...');
 
   EditorContent := StreamToUTF8(SourceEditor.Content);
+  Cursors := GetBufferViewCursors(Buffer);
 
   try
-    FormatResult := Core.Format(EditorContent, GetBufferViewCursors(Buffer));
+    FormatResult := Core.Format(EditorContent, Cursors.Offsets);
   except
     on E: Exception do begin
       Log.Error('Format invocation failed: %s', [E.Message]);
@@ -165,7 +176,8 @@ begin
   // Also, if you call this method more than once than the scroll position of the editor is ruined.
   Writer.Insert(PAnsiChar(FormatResult.Output));
 
-  SetBufferViewCursors(Buffer, FormatResult.Cursors);
+  Cursors.Offsets := FormatResult.Cursors;
+  SetBufferViewCursors(Buffer, Cursors);
 
   Log.Debug('Formatted "%s", %d cursors updated', [Buffer.FileName, Length(FormatResult.Cursors)]);
 end;
