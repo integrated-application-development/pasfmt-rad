@@ -1,4 +1,4 @@
-object PasfmtSettingsFrame: TPasfmtSettingsFrame
+﻿object PasfmtSettingsFrame: TPasfmtSettingsFrame
   Left = 0
   Top = 0
   Width = 390

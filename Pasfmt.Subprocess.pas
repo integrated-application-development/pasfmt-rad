@@ -1,4 +1,4 @@
-unit Pasfmt.Subprocess;
+﻿unit Pasfmt.Subprocess;
 
 interface
 
