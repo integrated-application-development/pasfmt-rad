@@ -93,7 +93,7 @@ begin
   MenuItem.Action := CreateAction('PasfmtOpenSettings', '&Settings...', OnSettingsActionExecute);
   FPasfmtMenu.Add(MenuItem);
 
-  (BorlandIDEServices as INTAServices).AddActionMenu('ViewTranslationManagerMenu', nil, FPasfmtMenu);
+  (BorlandIDEServices as INTAServices).AddActionMenu('CustomToolsItem', nil, FPasfmtMenu);
   FKeyboardBindingIndex :=
       (BorlandIDEServices as IOTAKeyboardServices).AddKeyboardBinding(TPasfmtKeyboardBinding.Create);
   FAddInOptions := TPasfmtAddInOptions.Create;
