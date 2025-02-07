@@ -17,6 +17,8 @@ type
     UserSettingsLabel: TLabel;
     TimeoutLabel: TLabel;
     TimeoutEdit: TEdit;
+    FastModeThresholdEdit: TEdit;
+    FastModeThresholdLabel: TLabel;
     procedure ExePathBrowseButtonClick(Sender: TObject);
     procedure ExePathRadioGroupClick(Sender: TObject);
   public
@@ -55,6 +57,7 @@ begin
   FFrame.UpdateExePathControls(PasfmtSettings.ExecutablePath);
   FFrame.OnSaveCheckBox.Checked := PasfmtSettings.FormatOnSave;
   FFrame.TimeoutEdit.Text := IntToStr(PasfmtSettings.FormatTimeout);
+  FFrame.FastModeThresholdEdit.Text := IntToStr(PasfmtSettings.MaxFileKiBWithUndoHistory);
 end;
 
 //______________________________________________________________________________________________________________________
@@ -63,6 +66,7 @@ procedure TPasfmtAddInOptions.DialogClosed(Accepted: Boolean);
 var
   LogLevelOrd: Integer;
   NewTimeout: Integer;
+  NewThreshold: Integer;
 begin
   if Accepted then begin
     PasfmtSettings.ExecutablePath := IfThen(FFrame.ExePathRadioGroup.ItemIndex = 1, Trim(FFrame.ExePathEdit.Text), '');
@@ -82,6 +86,10 @@ begin
 
     if not PasfmtSettings.FormatOnSave then begin
       OnSaveInstaller.UninstallAll;
+    end;
+
+    if TryStrToInt(FFrame.FastModeThresholdEdit.Text, NewThreshold) then begin
+      PasfmtSettings.MaxFileKiBWithUndoHistory := NewThreshold;
     end;
   end;
 

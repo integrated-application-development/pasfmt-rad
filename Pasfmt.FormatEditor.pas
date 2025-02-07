@@ -7,6 +7,7 @@ uses ToolsAPI, Pasfmt.FormatCore;
 type
   TEditBufferFormatter = record
     Core: TFormatter;
+    MaxFileKiBWithUndoHistory: Integer;
 
     procedure Format(Buffer: IOTAEditBuffer);
   end;
@@ -53,7 +54,7 @@ end;
 type
   TCursors = record
     Offsets: TArray<Integer>;
-    Rows: TArray<Integer>;
+    RowsFromTop: TArray<Integer>;
   end;
 
 function GetBufferViewCursors(Buffer: IOTAEditBuffer): TCursors;
@@ -64,14 +65,14 @@ var
   CharPos: TOTACharPos;
 begin
   SetLength(Result.Offsets, Buffer.EditViewCount);
-  SetLength(Result.Rows, Buffer.EditViewCount);
+  SetLength(Result.RowsFromTop, Buffer.EditViewCount);
   for I := 0 to Buffer.EditViewCount - 1 do begin
     EditView := Buffer.EditViews[I];
 
     EditPos := EditView.CursorPos;
     EditView.ConvertPos(True, EditPos, CharPos);
     Result.Offsets[I] := EditView.CharPosToPos(CharPos);
-    Result.Rows[I] := EditView.Position.Row;
+    Result.RowsFromTop[I] := EditView.Position.Row - EditView.TopRow;
   end;
 end;
 
@@ -94,7 +95,7 @@ begin
     CharPos := EditView.PosToCharPos(Cursors.Offsets[I]);
     EditView.ConvertPos(False, EditPos, CharPos);
     EditView.CursorPos := EditPos;
-    EditView.Scroll(CharPos.Line - Cursors.Rows[I], 0);
+    EditView.Scroll((EditView.Position.Row - EditView.TopRow) - Cursors.RowsFromTop[I], 0);
     EditView.Paint;
   end;
 end;
@@ -122,6 +123,7 @@ var
   FormatResult: TFormatResult;
   Writer: IOTAEditWriter;
   Cursors: TCursors;
+  FileSizeKiB: Integer;
 begin
   if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
     Log.Debug('Format request ignored: the editor is not formattable', [Buffer.FileName]);
@@ -155,6 +157,7 @@ begin
       Log.Warn(FormatResult.ErrorInfo);
     end;
   end;
+
   if FormatResult.ExitCode <> 0 then begin
     Log.Error('Format of "%s" failed', [Buffer.FileName]);
     SetBufferViewMessages(Buffer, CErrMsg);
@@ -169,16 +172,23 @@ begin
 
   SetBufferViewMessages(Buffer, 'Rendering...');
 
-  Writer := Buffer.CreateUndoableWriter;
-  Writer.DeleteTo(MaxInt);
   // the IDE always inserts a line ending after whatever we insert, so we have to trim the trailing line ending
   // that pasfmt creates.
   TrimTrailingNewlines(PAnsiChar(FormatResult.Output), Length(FormatResult.Output));
-  // While it would possible to insert with this Writer incrementally as stdout is consumed from the subprocess
-  // (avoiding collecting the entire output into a string), using this method from a thread other than the main thread
-  // either hangs or breaks things. I think this is the fault of the VCL components.
-  // Also, if you call this method more than once than the scroll position of the editor is ruined.
-  Writer.Insert(PAnsiChar(FormatResult.Output));
+
+  FileSizeKiB := Length(EditorContent) div 1024;
+  if FileSizeKiB > MaxFileKiBWithUndoHistory then begin
+    Log.Warn(
+        'Losing undo history for "%s" (file size %d KiB is above threshold %d KiB)',
+        [Buffer.FileName, FileSizeKiB, MaxFileKiBWithUndoHistory]
+    );
+    SourceEditor.Content := TStreamAdapter.Create(TStringStream.Create(FormatResult.Output), soOwned) as IStream;
+  end
+  else begin
+    Writer := Buffer.CreateUndoableWriter;
+    Writer.DeleteTo(MaxInt);
+    Writer.Insert(PAnsiChar(FormatResult.Output));
+  end;
 
   Cursors.Offsets := FormatResult.Cursors;
   SetBufferViewCursors(Buffer, Cursors);

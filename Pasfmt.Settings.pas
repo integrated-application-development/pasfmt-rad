@@ -12,6 +12,7 @@ type
       CExecutablePathName = 'Executable Path';
       CFormatOnSaveName = 'Format On Save';
       CFormatTimeoutName = 'Format Timeout';
+      CMaxFileKiBWithUndoHistory = 'Max File Size With Undo History';
   private
     FRegistry: TRegistry;
     FBaseKey: string;
@@ -20,11 +21,13 @@ type
     FExecutablePath: string;
     FFormatOnSave: Boolean;
     FFormatTimeout: Integer;
+    FMaxFileKiBWithUndoHistory: Integer;
 
     procedure SetLogLevel(Value: TLogLevel);
     procedure SetExecutablePath(Value: string);
     procedure SetFormatOnSave(Value: Boolean);
     procedure SetFormatTimeout(Value: Integer);
+    procedure SetMaxFileKiBWithUndoHistory(Value: Integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -35,6 +38,7 @@ type
     property ExecutablePath: string read FExecutablePath write SetExecutablePath;
     property FormatOnSave: Boolean read FFormatOnSave write SetFormatOnSave;
     property FormatTimeout: Integer read FFormatTimeout write SetFormatTimeout;
+    property MaxFileKiBWithUndoHistory: Integer read FMaxFileKiBWithUndoHistory write SetMaxFileKiBWithUndoHistory;
   end;
 
 function PasfmtSettings: TPasfmtSettings;
@@ -117,6 +121,20 @@ end;
 
 //______________________________________________________________________________________________________________________
 
+procedure TPasfmtSettings.SetMaxFileKiBWithUndoHistory(Value: Integer);
+begin
+  FMaxFileKiBWithUndoHistory := Value;
+
+  FRegistry.OpenKey(FBaseKey, True);
+  try
+    FRegistry.WriteInteger(CMaxFileKiBWithUndoHistory, Value);
+  finally
+    FRegistry.CloseKey;
+  end;
+end;
+
+//______________________________________________________________________________________________________________________
+
 procedure TPasfmtSettings.SetLogLevel(Value: TLogLevel);
 begin
   FLogLevel := Value;
@@ -139,6 +157,7 @@ begin
     FExecutablePath := '';
     FFormatOnSave := False;
     FFormatTimeout := 500;
+    FMaxFileKiBWithUndoHistory := 1024;
 
     if FRegistry.ValueExists(CLogLevelName) then
       FLogLevel := TLogLevel(FRegistry.ReadInteger(CLogLevelName))
@@ -159,6 +178,11 @@ begin
       FFormatTimeout := FRegistry.ReadInteger(CFormatTimeoutName)
     else
       FRegistry.WriteInteger(CFormatTimeoutName, FFormatTimeout);
+
+    if FRegistry.ValueExists(CMaxFileKiBWithUndoHistory) then
+      FMaxFileKiBWithUndoHistory := FRegistry.ReadInteger(CMaxFileKiBWithUndoHistory)
+    else
+      FRegistry.WriteInteger(CMaxFileKiBWithUndoHistory, FMaxFileKiBWithUndoHistory);
   finally
     FRegistry.CloseKey;
   end;
