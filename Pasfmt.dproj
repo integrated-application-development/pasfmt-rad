@@ -111,6 +111,14 @@
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>VERSIONJSON</ResourceId>
         </RcItem>
+        <RcItem Include="assets\pasfmt-icon-24x24.bmp">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>LOGO24</ResourceId>
+        </RcItem>
+        <RcItem Include="assets\pasfmt-icon-48x48.bmp">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>LOGO48</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -16,9 +16,11 @@ uses
     Pasfmt.SettingsFrame,
     Pasfmt.Settings,
     Winapi.Windows,
+    Vcl.Graphics,
     System.JSON,
     Pasfmt.Log,
     Pasfmt.OnSave,
+    System.Generics.Collections,
     System.IOUtils;
 
 type
@@ -29,6 +31,7 @@ type
     FInfoIndex: Integer;
     FEditorIndex: Integer;
     FAddInOptions: TPasfmtAddInOptions;
+    FBitmaps: TObjectList<TBitmap>;
 
     function GetPluginVersion: string;
 
@@ -73,10 +76,29 @@ constructor TPlugin.Create;
     (BorlandIDEServices as INTAServices).AddActionMenu('', Result, nil);
   end;
 
+  function LoadBitmap(ResourceName: string): HBITMAP;
+  var
+    Stream: TResourceStream;
+    Bitmap: TBitmap;
+  begin
+    // VCL LoadBitmap does not support 256-color bitmaps
+    Stream := TResourceStream.Create(HInstance, ResourceName, RT_RCDATA);
+    try
+      Bitmap := TBitmap.Create;
+      FBitmaps.Add(Bitmap);
+      Bitmap.LoadFromStream(Stream);
+      Result := Bitmap.Handle;
+    finally
+      FreeAndNil(Stream);
+    end;
+  end;
+
 var
   MenuItem: TMenuItem;
   PluginName: string;
 begin
+  FBitmaps := TObjectList<TBitmap>.Create;
+
   FEditorIndex := (BorlandIDEServices as IOTAEditorServices).AddNotifier(OnSaveInstaller);
   OnSaveInstaller.ConfigureFormatter := ConfigureFormatter;
 
@@ -107,11 +129,9 @@ begin
               PluginName,
               'RAD Studio plugin for pasfmt, the free and open source Delphi code formatter.'
                   + #13#10#13#10'Copyright © 2025 Integrated Application Development',
-              nil,
-              False,
-              '');
+              LoadBitmap('LOGO48'));
 
-  SplashScreenServices.AddPluginBitmap(PluginName, [], False);
+  SplashScreenServices.AddPluginBitmap(PluginName, LoadBitmap('LOGO24'));
 end;
 
 //______________________________________________________________________________________________________________________
@@ -123,6 +143,7 @@ begin
   (BorlandIDEServices as INTAEnvironmentOptionsServices).UnregisterAddInOptions(FAddInOptions);
   (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
   FreeAndNil(FPasfmtMenu);
+  FreeAndNil(FBitmaps);
   inherited;
 end;
 
