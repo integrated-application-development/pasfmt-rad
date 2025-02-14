@@ -138,6 +138,7 @@ end;
 
 destructor TPlugin.Destroy;
 begin
+  FinalizeLog;
   (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FEditorIndex);
   (BorlandIDEServices as IOTAAboutBoxServices).RemovePluginInfo(FInfoIndex);
   (BorlandIDEServices as INTAEnvironmentOptionsServices).UnregisterAddInOptions(FAddInOptions);

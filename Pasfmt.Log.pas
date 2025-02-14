@@ -20,6 +20,7 @@ type
   end;
 
 function Log: ILogger;
+procedure FinalizeLog;
 
 implementation
 
@@ -58,6 +59,7 @@ type
 
 var
   GLog: ILogger;
+  GFinalized: Boolean;
 
 function Log: ILogger;
 begin
@@ -67,6 +69,14 @@ begin
   end;
 
   Result := GLog;
+end;
+
+//______________________________________________________________________________________________________________________
+
+
+procedure FinalizeLog;
+begin
+  GFinalized := True;
 end;
 
 //______________________________________________________________________________________________________________________
@@ -175,6 +185,13 @@ procedure TMessageWindowLogger.Log(Msg: string; Prefix: string);
 var
   Dummy: Pointer;
 begin
+  if GFinalized then begin
+    // When the IDE starts to close, the IDE's services become increasingly unreliable.
+    // In particular, the message box services start throwing AVs after a certain point in the closing process,
+    // so we can no longer use them to log messages. In this circumstance we just swallow the messages for now.
+    Exit;
+  end;
+
   EnsureGroup;
   (BorlandIDEServices as IOTAMessageServices).AddToolMessage('', Msg, Prefix, 0, 0, nil, Dummy, FGroup);
 end;
