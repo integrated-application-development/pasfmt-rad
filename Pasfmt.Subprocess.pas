@@ -54,35 +54,35 @@ begin
           DataLen := DataLen - BytesRead;
         end;
 
-        FirstInput := False; //
+        FirstInput := False;
       end;
 
   StdOutHandler.Prepare :=
       procedure(var Data: PByte; var DataCapacity: Cardinal)
       begin
         Data := Pointer(Buf);
-        DataCapacity := Length(Buf) - 1; //
+        DataCapacity := Length(Buf) - 1;
       end;
 
   StdOutHandler.Consume :=
       procedure(Data: PByte; DataLen: Cardinal)
       begin
         Data[DataLen] := 0;
-        LocalStdOut := LocalStdOut + UTF8String(PAnsiChar(Data)); //
+        LocalStdOut := LocalStdOut + UTF8String(PAnsiChar(Data));
       end;
 
   StdErrHandler.Prepare :=
       procedure(var Data: PByte; var DataCapacity: Cardinal)
       begin
         Data := Pointer(BufErr);
-        DataCapacity := Length(BufErr) - 1; //
+        DataCapacity := Length(BufErr) - 1;
       end;
 
   StdErrHandler.Consume :=
       procedure(Data: PByte; DataLen: Cardinal)
       begin
         Data[DataLen] := 0;
-        LocalStdErr := LocalStdErr + UTF8String(PAnsiChar(Data)); //
+        LocalStdErr := LocalStdErr + UTF8String(PAnsiChar(Data));
       end;
 
   Result :=

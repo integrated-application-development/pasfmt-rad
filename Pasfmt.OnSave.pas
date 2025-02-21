@@ -139,7 +139,7 @@ begin
   // implement interface
 end;
 
-procedure TFormatOnSaveInstallerNotifier.EditorViewActivated( //
+procedure TFormatOnSaveInstallerNotifier.EditorViewActivated(
     const EditWindow: INTAEditWindow;
     const EditView: IOTAEditView
 );

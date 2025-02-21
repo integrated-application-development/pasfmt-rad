@@ -201,7 +201,7 @@ begin
   (BorlandIDEServices as IOTAServices).GetEnvironmentOptions.EditOptions('', 'Pasfmt');
 end;
 
-procedure TPlugin.OnFormatKeyPress( //
+procedure TPlugin.OnFormatKeyPress(
     const Context: IOTAKeyContext;
     KeyCode: TShortCut;
     var BindingResult: TKeyBindingResult
