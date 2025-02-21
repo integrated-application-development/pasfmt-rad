@@ -1,4 +1,5 @@
-﻿package Pasfmt;
+﻿{pasfmt off}
+package Pasfmt;
 
 {$R *.res}
 {$R *.dres}
