@@ -2,7 +2,9 @@
 
 interface
 
-uses Pasfmt.Log, System.Win.Registry;
+uses
+  Pasfmt.Log,
+  System.Win.Registry;
 
 type
   TPasfmtSettings = class(TObject)
@@ -45,7 +47,10 @@ function PasfmtSettings: TPasfmtSettings;
 
 implementation
 
-uses ToolsAPI, System.SysUtils, Winapi.Windows;
+uses
+  ToolsAPI,
+  System.SysUtils,
+  Winapi.Windows;
 
 var
   GSettings: TPasfmtSettings;

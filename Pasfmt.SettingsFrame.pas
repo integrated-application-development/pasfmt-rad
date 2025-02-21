@@ -2,7 +2,14 @@
 
 interface
 
-uses System.Classes, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ToolsAPI, Vcl.StdCtrls, Vcl.ExtCtrls;
+uses
+  System.Classes,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  ToolsAPI,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls;
 
 type
   TPasfmtSettingsFrame = class(TFrame)
@@ -42,7 +49,13 @@ type
 
 implementation
 
-uses System.IOUtils, Pasfmt.Settings, Pasfmt.Log, System.StrUtils, Pasfmt.OnSave, System.SysUtils;
+uses
+  System.IOUtils,
+  Pasfmt.Settings,
+  Pasfmt.Log,
+  System.StrUtils,
+  Pasfmt.OnSave,
+  System.SysUtils;
 
 {$R *.dfm}
 

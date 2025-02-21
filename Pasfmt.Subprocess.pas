@@ -13,7 +13,9 @@ function RunProcess(
 
 implementation
 
-uses Pasfmt.WinExec, System.SysUtils;
+uses
+  Pasfmt.WinExec,
+  System.SysUtils;
 
 function RunProcess(
     CommandLine: string;

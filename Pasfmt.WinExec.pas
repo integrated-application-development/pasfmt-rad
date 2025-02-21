@@ -2,7 +2,8 @@
 
 interface
 
-uses Winapi.Windows;
+uses
+  Winapi.Windows;
 
 type
   TReadPrepareOutputProc = reference to procedure(var Data: PByte; var DataCapacity: Cardinal);
@@ -28,7 +29,10 @@ function RunWinProcess(
 
 implementation
 
-uses System.Classes, System.SysUtils, Pasfmt.Log;
+uses
+  System.Classes,
+  System.SysUtils,
+  Pasfmt.Log;
 
 type
   TOutputPipeThread = class(TThread)
@@ -178,7 +182,8 @@ begin
         WAIT_TIMEOUT: begin
           raise Exception.CreateFmt('subprocess timed out after %d ms: %s', [TimeoutMillis, CommandLine]);
         end;
-        WAIT_FAILED: RaiseLastOSError;
+        WAIT_FAILED:
+          RaiseLastOSError;
       else
         if not GetExitCodeProcess(ProcessInfo.hProcess, Result) then
           RaiseLastOSError;

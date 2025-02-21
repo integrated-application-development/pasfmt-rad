@@ -2,7 +2,9 @@
 
 interface
 
-uses ToolsAPI, Pasfmt.FormatCore;
+uses
+  ToolsAPI,
+  Pasfmt.FormatCore;
 
 type
   TEditBufferFormatter = record
@@ -14,7 +16,13 @@ type
 
 implementation
 
-uses System.SysUtils, System.Classes, Winapi.ActiveX, Vcl.AxCtrls, Pasfmt.Log, System.StrUtils;
+uses
+  System.SysUtils,
+  System.Classes,
+  Winapi.ActiveX,
+  Vcl.AxCtrls,
+  Pasfmt.Log,
+  System.StrUtils;
 
 //______________________________________________________________________________________________________________________
 

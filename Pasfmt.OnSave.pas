@@ -2,7 +2,12 @@
 
 interface
 
-uses ToolsAPI, System.Classes, DockForm, System.Generics.Collections, Pasfmt.FormatEditor;
+uses
+  ToolsAPI,
+  System.Classes,
+  DockForm,
+  System.Generics.Collections,
+  Pasfmt.FormatEditor;
 
 type
   TConfigureFormatterProc = reference to procedure(var Formatter: TEditBufferFormatter);
@@ -55,7 +60,10 @@ function OnSaveInstaller: TFormatOnSaveInstallerNotifier;
 
 implementation
 
-uses System.SysUtils, Pasfmt.Log, Pasfmt.Settings;
+uses
+  System.SysUtils,
+  Pasfmt.Log,
+  Pasfmt.Settings;
 
 var
   // TFormatOnSaveInstallerNotifier
@@ -123,8 +131,10 @@ begin
   // implement interface
 end;
 
-procedure TFormatOnSaveInstallerNotifier
-    .DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+procedure TFormatOnSaveInstallerNotifier.DockFormVisibleChanged(
+    const EditWindow: INTAEditWindow;
+    DockForm: TDockableForm
+);
 begin
   // implement interface
 end;
@@ -149,8 +159,10 @@ begin
   end;
 end;
 
-procedure TFormatOnSaveInstallerNotifier
-    .EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
+procedure TFormatOnSaveInstallerNotifier.EditorViewModified(
+    const EditWindow: INTAEditWindow;
+    const EditView: IOTAEditView
+);
 begin
   // implement interface
 end;
@@ -160,8 +172,11 @@ begin
   // implement interface
 end;
 
-procedure TFormatOnSaveInstallerNotifier
-    .WindowCommand(const EditWindow: INTAEditWindow; Command, Param: Integer; var Handled: Boolean);
+procedure TFormatOnSaveInstallerNotifier.WindowCommand(
+    const EditWindow: INTAEditWindow;
+    Command, Param: Integer;
+    var Handled: Boolean
+);
 begin
   // implement interface
 end;

@@ -19,7 +19,10 @@ type
 
 implementation
 
-uses Pasfmt.Subprocess, System.SysUtils, System.StrUtils;
+uses
+  Pasfmt.Subprocess,
+  System.SysUtils,
+  System.StrUtils;
 
 //______________________________________________________________________________________________________________________
 

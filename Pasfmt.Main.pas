@@ -7,21 +7,21 @@ procedure Register;
 implementation
 
 uses
-    System.Classes,
-    ToolsAPI,
-    System.SysUtils,
-    Vcl.Menus,
-    Vcl.ActnList,
-    Pasfmt.FormatEditor,
-    Pasfmt.SettingsFrame,
-    Pasfmt.Settings,
-    Winapi.Windows,
-    Vcl.Graphics,
-    System.JSON,
-    Pasfmt.Log,
-    Pasfmt.OnSave,
-    System.Generics.Collections,
-    System.IOUtils;
+  System.Classes,
+  ToolsAPI,
+  System.SysUtils,
+  Vcl.Menus,
+  Vcl.ActnList,
+  Pasfmt.FormatEditor,
+  Pasfmt.SettingsFrame,
+  Pasfmt.Settings,
+  Winapi.Windows,
+  Vcl.Graphics,
+  System.JSON,
+  Pasfmt.Log,
+  Pasfmt.OnSave,
+  System.Generics.Collections,
+  System.IOUtils;
 
 type
   TPlugin = class(TObject)

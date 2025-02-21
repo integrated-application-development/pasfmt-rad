@@ -24,7 +24,10 @@ procedure FinalizeLog;
 
 implementation
 
-uses ToolsAPI, System.SysUtils, Pasfmt.Settings;
+uses
+  ToolsAPI,
+  System.SysUtils,
+  Pasfmt.Settings;
 
 type
   TMessageWindowLogger = class(TNotifierObject, ILogger, IOTAMessageNotifier)
@@ -72,7 +75,6 @@ begin
 end;
 
 //______________________________________________________________________________________________________________________
-
 
 procedure FinalizeLog;
 begin
