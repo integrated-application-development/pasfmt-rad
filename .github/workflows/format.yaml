@@ -1,0 +1,21 @@
+name: Format
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  delphi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run pasfmt
+        uses: integrated-application-development/pasfmt-action@v1
+        with:
+          release-name: "v0.4.0-rc1"
