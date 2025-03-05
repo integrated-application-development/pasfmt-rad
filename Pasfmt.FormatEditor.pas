@@ -4,7 +4,8 @@ interface
 
 uses
   ToolsAPI,
-  Pasfmt.FormatCore;
+  Pasfmt.FormatCore,
+  Pasfmt.Cursors;
 
 type
   TEditBufferFormatter = record
@@ -12,6 +13,8 @@ type
     MaxFileKiBWithUndoHistory: Integer;
 
     procedure Format(Buffer: IOTAEditBuffer);
+  private
+    procedure FormatWithCursors(Buffer: IOTAEditBuffer; SourceEditor: IOTAEditorContent; Cursors: TCursors);
   end;
 
 implementation
@@ -59,57 +62,6 @@ end;
 
 //______________________________________________________________________________________________________________________
 
-type
-  TCursors = record
-    Offsets: TArray<Integer>;
-    RowsFromTop: TArray<Integer>;
-  end;
-
-function GetBufferViewCursors(Buffer: IOTAEditBuffer): TCursors;
-var
-  I: Integer;
-  EditView: IOTAEditView;
-  EditPos: TOTAEditPos;
-  CharPos: TOTACharPos;
-begin
-  SetLength(Result.Offsets, Buffer.EditViewCount);
-  SetLength(Result.RowsFromTop, Buffer.EditViewCount);
-  for I := 0 to Buffer.EditViewCount - 1 do begin
-    EditView := Buffer.EditViews[I];
-
-    EditPos := EditView.CursorPos;
-    EditView.ConvertPos(True, EditPos, CharPos);
-    Result.Offsets[I] := EditView.CharPosToPos(CharPos);
-    Result.RowsFromTop[I] := EditView.Position.Row - EditView.TopRow;
-  end;
-end;
-
-//______________________________________________________________________________________________________________________
-
-procedure SetBufferViewCursors(Buffer: IOTAEditBuffer; Cursors: TCursors);
-var
-  I: Integer;
-  EditView: IOTAEditView;
-  EditPos: TOTAEditPos;
-  CharPos: TOTACharPos;
-begin
-  for I := 0 to Buffer.EditViewCount - 1 do begin
-    if (I >= Length(Cursors.Offsets)) or (Cursors.Offsets[I] < 0) then begin
-      Continue;
-    end;
-
-    EditView := Buffer.EditViews[I];
-
-    CharPos := EditView.PosToCharPos(Cursors.Offsets[I]);
-    EditView.ConvertPos(False, EditPos, CharPos);
-    EditView.CursorPos := EditPos;
-    EditView.Scroll((EditView.Position.Row - EditView.TopRow) - Cursors.RowsFromTop[I], 0);
-    EditView.Paint;
-  end;
-end;
-
-//______________________________________________________________________________________________________________________
-
 procedure SetBufferViewMessages(Buffer: IOTAEditBuffer; Msg: string);
 var
   I: Integer;
@@ -122,16 +74,9 @@ end;
 //______________________________________________________________________________________________________________________
 
 procedure TEditBufferFormatter.Format(Buffer: IOTAEditBuffer);
-const
-  CSuccessMsg = 'Formatted ✓';
-  CErrMsg = 'Format error';
 var
   SourceEditor: IOTAEditorContent;
-  EditorContent: UTF8String;
-  FormatResult: TFormatResult;
-  Writer: IOTAEditWriter;
   Cursors: TCursors;
-  FileSizeKiB: Integer;
 begin
   if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
     Log.Debug('Format request ignored: the editor is not formattable', [Buffer.FileName]);
@@ -144,11 +89,31 @@ begin
 
   SetBufferViewMessages(Buffer, 'Formatting...');
 
-  EditorContent := StreamToUTF8(SourceEditor.Content);
-  Cursors := GetBufferViewCursors(Buffer);
-
+  Cursors := TCursors.Create(Buffer);
   try
-    FormatResult := Core.Format(EditorContent, Cursors.Offsets);
+    FormatWithCursors(Buffer, SourceEditor, Cursors);
+  finally
+    FreeAndNil(Cursors);
+  end;
+end;
+
+procedure TEditBufferFormatter.FormatWithCursors(
+    Buffer: IOTAEditBuffer;
+    SourceEditor: IOTAEditorContent;
+    Cursors: TCursors
+);
+const
+  CSuccessMsg = 'Formatted ✓';
+  CErrMsg = 'Format error';
+var
+  EditorContent: UTF8String;
+  FormatResult: TFormatResult;
+  Writer: IOTAEditWriter;
+  FileSizeKiB: Integer;
+begin
+  EditorContent := StreamToUTF8(SourceEditor.Content);
+  try
+    FormatResult := Core.Format(EditorContent, Cursors.Serialize);
   except
     on E: Exception do begin
       Log.Error('Format invocation failed: %s', [E.Message]);
@@ -198,8 +163,8 @@ begin
     Writer.Insert(PAnsiChar(FormatResult.Output));
   end;
 
-  Cursors.Offsets := FormatResult.Cursors;
-  SetBufferViewCursors(Buffer, Cursors);
+  Cursors.Deserialize(FormatResult.Cursors);
+  Cursors.UpdateBuffer(Buffer);
 
   Log.Debug('Formatted "%s", %d cursors updated', [Buffer.FileName, Length(FormatResult.Cursors)]);
   SetBufferViewMessages(Buffer, CSuccessMsg);

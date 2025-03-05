@@ -106,6 +106,7 @@
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="Pasfmt.OnSave.pas"/>
+        <DCCReference Include="Pasfmt.Cursors.pas"/>
         <RcItem Include="version.json">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>

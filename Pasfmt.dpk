@@ -44,6 +44,7 @@ contains
   Pasfmt.Log in 'Pasfmt.Log.pas',
   Pasfmt.Settings in 'Pasfmt.Settings.pas',
   Pasfmt.SettingsFrame in 'Pasfmt.SettingsFrame.pas' {PasfmtSettingsFrame: TFrame},
-  Pasfmt.OnSave in 'Pasfmt.OnSave.pas';
+  Pasfmt.OnSave in 'Pasfmt.OnSave.pas',
+  Pasfmt.Cursors in 'Pasfmt.Cursors.pas';
 
 end.
