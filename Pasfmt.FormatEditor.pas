@@ -25,7 +25,9 @@ uses
   Winapi.ActiveX,
   Vcl.AxCtrls,
   Pasfmt.Log,
-  System.StrUtils;
+  System.StrUtils,
+  Vcl.Dialogs,
+  System.UITypes;
 
 //______________________________________________________________________________________________________________________
 
@@ -73,9 +75,19 @@ end;
 
 //______________________________________________________________________________________________________________________
 
+function ConfirmFormatWhileDebugging: Boolean;
+begin
+  Result :=
+      MessageDlg('Formatting will disrupt debugging in this file. Continue?', mtWarning, [mbOK, mbCancel], 0, mbCancel)
+          = mrOK;
+end;
+
+//______________________________________________________________________________________________________________________
+
 procedure TEditBufferFormatter.Format(Buffer: IOTAEditBuffer);
 var
   SourceEditor: IOTAEditorContent;
+  DebuggerServices: IOTADebuggerServices;
   Cursors: TCursors;
 begin
   if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
@@ -84,6 +96,13 @@ begin
   end
   else if Buffer.IsReadOnly then begin
     Log.Debug('Format request ignored: "%s" is read-only', [Buffer.FileName]);
+    Exit;
+  end
+  else if Supports(BorlandIDEServices, IOTADebuggerServices, DebuggerServices)
+      and Assigned(DebuggerServices.CurrentProcess)
+      and not ConfirmFormatWhileDebugging then
+  begin
+    Log.Debug('Format request ignored: debugger is running and user has cancelled');
     Exit;
   end;
 
