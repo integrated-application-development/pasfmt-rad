@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Support for updating breakpoints and bookmarks after the buffer rewrite.
+* Confirmation prompt for formatting while debugging.
 
 ## [0.1.0] - 2025-02-20
 

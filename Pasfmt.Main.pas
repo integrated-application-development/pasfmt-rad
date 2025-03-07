@@ -207,6 +207,7 @@ procedure TPlugin.OnFormatKeyPress(
     var BindingResult: TKeyBindingResult
 );
 begin
+  BindingResult := krHandled;
   Format;
 end;
 
