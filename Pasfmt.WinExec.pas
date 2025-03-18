@@ -182,8 +182,7 @@ begin
         WAIT_TIMEOUT: begin
           raise Exception.CreateFmt('subprocess timed out after %d ms: %s', [TimeoutMillis, CommandLine]);
         end;
-        WAIT_FAILED:
-          RaiseLastOSError;
+        WAIT_FAILED: RaiseLastOSError;
       else
         if not GetExitCodeProcess(ProcessInfo.hProcess, Result) then
           RaiseLastOSError;
