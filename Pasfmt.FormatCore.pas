@@ -39,6 +39,7 @@ var
   StartPos: Integer;
   EndPos: Integer;
 begin
+  Result := Data;
   TagPos := System.Pos(CTag, Data);
   if TagPos > 0 then begin
     StartPos := TagPos + Length(CTag);
