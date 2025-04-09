@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Ignore formatting requests for files without matching file extensions (pas, dpr, dpk, inc).
+* Fix error logging when cursor metadata is not parsed correctly.
 
 ### Changed
 
