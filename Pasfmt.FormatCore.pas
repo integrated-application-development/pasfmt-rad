@@ -12,9 +12,8 @@ type
 
   TFormatter = record
     Executable: string;
-    WorkingDirectory: string;
     Timeout: Integer;
-    function Format(Input: UTF8String; Cursors: TArray<Integer>): TFormatResult;
+    function Format(Input: UTF8String; Cursors: TArray<Integer>; WorkingDirectory: string): TFormatResult;
   end;
 
 implementation
@@ -86,7 +85,7 @@ end;
 
 //______________________________________________________________________________________________________________________
 
-function TFormatter.Format(Input: UTF8String; Cursors: TArray<Integer>): TFormatResult;
+function TFormatter.Format(Input: UTF8String; Cursors: TArray<Integer>; WorkingDirectory: string): TFormatResult;
 var
   CommandLine: string;
   StdErr: UTF8String;

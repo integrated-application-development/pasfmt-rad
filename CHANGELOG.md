@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Ignore formatting requests for files without matching file extensions (pas, dpr, dpk, inc).
 
+### Changed
+
+* Working directory for `pasfmt` is now set to the parent directory of the file being formatted.
+  Previously, the parent directory of the active project file was used.
+
 ## [0.2.0] - 2025-03-18
 
 ### Added
