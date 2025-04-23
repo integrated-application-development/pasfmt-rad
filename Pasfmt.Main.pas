@@ -20,8 +20,7 @@ uses
   System.JSON,
   Pasfmt.Log,
   Pasfmt.OnSave,
-  System.Generics.Collections,
-  System.IOUtils;
+  System.Generics.Collections;
 
 type
   TPlugin = class(TObject)
@@ -151,18 +150,10 @@ end;
 //______________________________________________________________________________________________________________________
 
 procedure TPlugin.ConfigureFormatter(var Formatter: TEditBufferFormatter);
-var
-  Project: IOTAProject;
 begin
   Formatter.Core.Executable := PasfmtSettings.ExecutablePath;
   Formatter.Core.Timeout := PasfmtSettings.FormatTimeout;
   Formatter.MaxFileKiBWithUndoHistory := PasfmtSettings.MaxFileKiBWithUndoHistory;
-
-  Project := (BorlandIDEServices as IOTAModuleServices).GetActiveProject;
-  if Assigned(Project) then begin
-    // Ensures pasfmt is reading the config file if present
-    Formatter.Core.WorkingDirectory := TPath.GetDirectoryName(Project.FileName);
-  end;
 end;
 
 //______________________________________________________________________________________________________________________

@@ -139,7 +139,7 @@ var
 begin
   EditorContent := StreamToUTF8(SourceEditor.Content);
   try
-    FormatResult := Core.Format(EditorContent, Cursors.Serialize);
+    FormatResult := Core.Format(EditorContent, Cursors.Serialize, TPath.GetDirectoryName(Buffer.FileName));
   except
     on E: Exception do begin
       Log.Error('Format invocation failed: %s', [E.Message]);
