@@ -27,7 +27,8 @@ uses
   Pasfmt.Log,
   System.StrUtils,
   Vcl.Dialogs,
-  System.UITypes;
+  System.UITypes,
+  System.IOUtils;
 
 //______________________________________________________________________________________________________________________
 
@@ -89,8 +90,14 @@ var
   SourceEditor: IOTAEditorContent;
   DebuggerServices: IOTADebuggerServices;
   Cursors: TCursors;
+  Extension: string;
 begin
-  if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
+  Extension := TPath.GetExtension(Buffer.FileName);
+  if not MatchText(Extension, ['.pas', '.dpr', '.dpk', '.inc']) then begin
+    Log.Debug('Format request ignored: unsupported file extension "%s"', [Extension]);
+    Exit;
+  end
+  else if not Supports(Buffer, IOTAEditorContent, SourceEditor) then begin
     Log.Debug('Format request ignored: the editor is not formattable', [Buffer.FileName]);
     Exit;
   end

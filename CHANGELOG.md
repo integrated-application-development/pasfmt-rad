@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+* Ignore formatting requests for files without matching file extensions (pas, dpr, dpk, inc).
+
 ## [0.2.0] - 2025-03-18
 
 ### Added
