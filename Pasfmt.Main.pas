@@ -231,6 +231,8 @@ procedure TPasfmtKeyboardBinding.BindKeyboard(const BindingServices: IOTAKeyBind
 begin
   BindingServices
       .AddKeyBinding([ShortCut(Ord('F'), [ssCtrl, ssAlt])], GPlugin.OnFormatKeyPress, nil, 0, '', 'PasfmtFormatItem');
+  BindingServices
+      .AddKeyBinding([ShortCut(Ord('D'), [ssCtrl])], GPlugin.OnFormatKeyPress, nil, 0, '', 'PasfmtFormatItem');
 end;
 
 function TPasfmtKeyboardBinding.GetBindingType: TBindingType;
