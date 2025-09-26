@@ -154,6 +154,7 @@ begin
   Formatter.Core.Executable := PasfmtSettings.ExecutablePath;
   Formatter.Core.Timeout := PasfmtSettings.FormatTimeout;
   Formatter.MaxFileKiBWithUndoHistory := PasfmtSettings.MaxFileKiBWithUndoHistory;
+  Formatter.Core.BeginStyle := PasfmtSettings.BeginStyle;
 end;
 
 //______________________________________________________________________________________________________________________

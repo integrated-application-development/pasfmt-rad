@@ -11,6 +11,7 @@ type
   TEditBufferFormatter = record
     Core: TFormatter;
     MaxFileKiBWithUndoHistory: Integer;
+    BeginStyle: Integer;
 
     procedure Format(Buffer: IOTAEditBuffer);
   private

@@ -24,12 +24,14 @@ type
     FFormatOnSave: Boolean;
     FFormatTimeout: Integer;
     FMaxFileKiBWithUndoHistory: Integer;
+    FBeginStyle: Integer;
 
     procedure SetLogLevel(Value: TLogLevel);
     procedure SetExecutablePath(Value: string);
     procedure SetFormatOnSave(Value: Boolean);
     procedure SetFormatTimeout(Value: Integer);
     procedure SetMaxFileKiBWithUndoHistory(Value: Integer);
+    procedure SetBeginStyle(const Value: Integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -41,6 +43,7 @@ type
     property FormatOnSave: Boolean read FFormatOnSave write SetFormatOnSave;
     property FormatTimeout: Integer read FFormatTimeout write SetFormatTimeout;
     property MaxFileKiBWithUndoHistory: Integer read FMaxFileKiBWithUndoHistory write SetMaxFileKiBWithUndoHistory;
+    property BeginStyle: Integer read FBeginStyle write SetBeginStyle;
   end;
 
 function PasfmtSettings: TPasfmtSettings;
@@ -80,6 +83,11 @@ destructor TPasfmtSettings.Destroy;
 begin
   FreeAndNil(FRegistry);
   inherited;
+end;
+
+procedure TPasfmtSettings.SetBeginStyle(const Value: Integer);
+begin
+  FBeginStyle := Value;
 end;
 
 //______________________________________________________________________________________________________________________

@@ -2,7 +2,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   Left = 0
   Top = 0
   Width = 392
-  Height = 376
+  Height = 508
   Constraints.MinHeight = 180
   Constraints.MinWidth = 390
   TabOrder = 0
@@ -16,7 +16,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   object ExePathLabel: TLabel
     Left = 3
     Top = 205
-    Width = 103
+    Width = 102
     Height = 15
     Caption = 'Executable location'
   end
@@ -37,13 +37,14 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   object FastModeThresholdLabel: TLabel
     Left = 3
     Top = 155
-    Width = 220
+    Width = 219
     Height = 15
     Cursor = crHelp
     Hint = 
-      'To avoid performance issues with updating large files, a faster method ' +
-      'is used when the file size exceeds this configured threshold.'#13#10'This ' +
-      'faster method unfortunately clears the undo history of the edit buffer.'
+      'To avoid performance issues with updating large files, a faster ' +
+      'method is used when the file size exceeds this configured thresh' +
+      'old.'#13#10'This faster method unfortunately clears the undo history o' +
+      'f the edit buffer.'
     Caption = 'Maximum file size with undo history (KiB)'
   end
   object LogLevelCombo: TComboBox
@@ -119,10 +120,22 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
     TabOrder = 6
     Text = '1024'
   end
+  object rgBeginStyle: TRadioGroup
+    Left = 11
+    Top = 352
+    Width = 369
+    Height = 81
+    Caption = '"begin" Style'
+    ItemIndex = 0
+    Items.Strings = (
+      '"begin" on the same line'
+      '"begin" on a new line')
+    TabOrder = 7
+  end
   object ExeChooseDialog: TOpenDialog
     Filter = 'Executable files (*.exe)|*.exe'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 291
-    Top = 52
+    Left = 275
+    Top = 156
   end
 end

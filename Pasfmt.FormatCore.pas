@@ -13,6 +13,7 @@ type
   TFormatter = record
     Executable: string;
     Timeout: Integer;
+    BeginStyle: Integer; //bsAuto = 0, bsAlwaysWrap = 1
     function Format(Input: UTF8String; Cursors: TArray<Integer>; WorkingDirectory: string): TFormatResult;
   end;
 
@@ -92,14 +93,25 @@ var
   StdErr: UTF8String;
   CursorTagValue: string;
   EffectiveExe: string;
+  BeginStyleAsStr: string;
 begin
   EffectiveExe := Executable;
   if EffectiveExe = '' then begin
     EffectiveExe := 'pasfmt.exe';
   end;
 
+  case BeginStyle of
+    0: BeginStyleAsStr := 'auto';
+    1: BeginStyleAsStr := 'always_wrap';
+  else
+    raise Exception.Create('Invalid BeginStyle setting: ' + BeginStyle.ToString);
+  end;
+  BeginStyleAsStr := '-C begin_style=' + BeginStyleAsStr;
+
   CommandLine :=
-      System.SysUtils.Format('"%s" -C encoding=utf-8 --cursor=%s', [EffectiveExe, SerializeCursors(Cursors)]);
+      System
+          .SysUtils
+          .Format('"%s" -C encoding=utf-8 %s --cursor=%s', [EffectiveExe, BeginStyleAsStr, SerializeCursors(Cursors)]);
 
   Result := Default(TFormatResult);
   Result.ExitCode := RunProcess(CommandLine, Input, Result.Output, StdErr, WorkingDirectory, Timeout);

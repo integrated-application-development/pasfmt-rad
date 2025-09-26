@@ -26,6 +26,7 @@ type
     TimeoutEdit: TEdit;
     FastModeThresholdEdit: TEdit;
     FastModeThresholdLabel: TLabel;
+    rgBeginStyle: TRadioGroup;
     procedure ExePathBrowseButtonClick(Sender: TObject);
     procedure ExePathRadioGroupClick(Sender: TObject);
   public
@@ -71,6 +72,7 @@ begin
   FFrame.OnSaveCheckBox.Checked := PasfmtSettings.FormatOnSave;
   FFrame.TimeoutEdit.Text := IntToStr(PasfmtSettings.FormatTimeout);
   FFrame.FastModeThresholdEdit.Text := IntToStr(PasfmtSettings.MaxFileKiBWithUndoHistory);
+  FFrame.rgBeginStyle.ItemIndex := PasfmtSettings.BeginStyle;
 end;
 
 //______________________________________________________________________________________________________________________
@@ -83,6 +85,8 @@ var
 begin
   if Accepted then begin
     PasfmtSettings.ExecutablePath := IfThen(FFrame.ExePathRadioGroup.ItemIndex = 1, Trim(FFrame.ExePathEdit.Text), '');
+
+    PasfmtSettings.BeginStyle := FFrame.rgBeginStyle.ItemIndex;
 
     if TryStrToInt(FFrame.TimeoutEdit.Text, NewTimeout) then begin
       PasfmtSettings.FormatTimeout := NewTimeout;
