@@ -20,6 +20,7 @@ uses
   System.JSON,
   Pasfmt.Log,
   Pasfmt.OnSave,
+  Pasfmt.ProjectNotifier,
   System.Generics.Collections;
 
 type
@@ -29,6 +30,7 @@ type
     FKeyboardBindingIndex: Integer;
     FInfoIndex: Integer;
     FEditorIndex: Integer;
+    FProjectIndex: Integer;
     FAddInOptions: TPasfmtAddInOptions;
     FBitmaps: TObjectList<TBitmap>;
 
@@ -99,6 +101,7 @@ begin
   FBitmaps := TObjectList<TBitmap>.Create;
 
   FEditorIndex := (BorlandIDEServices as IOTAEditorServices).AddNotifier(OnSaveInstaller);
+  FProjectIndex := (BorlandIDEServices as IOTAProject).AddNotifier(OnProjectNotify);
   OnSaveInstaller.ConfigureFormatter := ConfigureFormatter;
 
   FPasfmtMenu := TMenuItem.Create((BorlandIDEServices as INTAServices).MainMenu);
@@ -139,6 +142,7 @@ destructor TPlugin.Destroy;
 begin
   FinalizeLog;
   (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FEditorIndex);
+  (BorlandIDEServices as IOTAProject).RemoveNotifier(FProjectIndex);
   (BorlandIDEServices as IOTAAboutBoxServices).RemovePluginInfo(FInfoIndex);
   (BorlandIDEServices as INTAEnvironmentOptionsServices).UnregisterAddInOptions(FAddInOptions);
   (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
