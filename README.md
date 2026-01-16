@@ -22,6 +22,8 @@ and opinionated formatter for Delphi code, into the IDE.
 
 With a file open in the editor, a format can be triggered with `Ctrl+Alt+F` (`Tools > Pasfmt > Format`).
 
+The hotkey for formatting can be changed in the settings menu (`Tools > Pasfmt > Settings...`)
+
 The formatter can optionally be triggered on save; this can be enabled in  `Tools > Pasfmt > Settings...` by toggling
 `Format on save`.
 
