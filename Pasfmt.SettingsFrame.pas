@@ -9,7 +9,8 @@ uses
   Vcl.Dialogs,
   ToolsAPI,
   Vcl.StdCtrls,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls;
 
 type
   TPasfmtSettingsFrame = class(TFrame)
@@ -26,6 +27,8 @@ type
     TimeoutEdit: TEdit;
     FastModeThresholdEdit: TEdit;
     FastModeThresholdLabel: TLabel;
+    FormatHotkeyEdit: THotKey;
+    FormatHotkeyLabel: TLabel;
     procedure ExePathBrowseButtonClick(Sender: TObject);
     procedure ExePathRadioGroupClick(Sender: TObject);
   public
@@ -71,6 +74,7 @@ begin
   FFrame.OnSaveCheckBox.Checked := PasfmtSettings.FormatOnSave;
   FFrame.TimeoutEdit.Text := IntToStr(PasfmtSettings.FormatTimeout);
   FFrame.FastModeThresholdEdit.Text := IntToStr(PasfmtSettings.MaxFileKiBWithUndoHistory);
+  FFrame.FormatHotkeyEdit.HotKey := PasfmtSettings.FormatHotkey;
 end;
 
 //______________________________________________________________________________________________________________________
@@ -104,6 +108,8 @@ begin
     if TryStrToInt(FFrame.FastModeThresholdEdit.Text, NewThreshold) then begin
       PasfmtSettings.MaxFileKiBWithUndoHistory := NewThreshold;
     end;
+
+    PasfmtSettings.FormatHotkey := FFrame.FormatHotkeyEdit.HotKey;
   end;
 
   FFrame := nil;

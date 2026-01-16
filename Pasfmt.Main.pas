@@ -39,6 +39,8 @@ type
     procedure OnSettingsActionExecute(Sender: TObject);
     procedure Format;
 
+    procedure RegisterKeyboardBinding;
+    procedure UnregisterKeyboardBinding;
     procedure ConfigureFormatter(var Formatter: TEditBufferFormatter);
   public
     constructor Create;
@@ -115,8 +117,15 @@ begin
   FPasfmtMenu.Add(MenuItem);
 
   (BorlandIDEServices as INTAServices).AddActionMenu('CustomToolsItem', nil, FPasfmtMenu);
-  FKeyboardBindingIndex :=
-      (BorlandIDEServices as IOTAKeyboardServices).AddKeyboardBinding(TPasfmtKeyboardBinding.Create);
+
+  RegisterKeyboardBinding;
+  PasfmtSettings.OnFormatHotkeyChanged :=
+      procedure
+      begin
+        UnregisterKeyboardBinding;
+        RegisterKeyboardBinding;
+      end;
+
   FAddInOptions := TPasfmtAddInOptions.Create;
   (BorlandIDEServices as INTAEnvironmentOptionsServices).RegisterAddInOptions(FAddInOptions);
 
@@ -141,7 +150,7 @@ begin
   (BorlandIDEServices as IOTAEditorServices).RemoveNotifier(FEditorIndex);
   (BorlandIDEServices as IOTAAboutBoxServices).RemovePluginInfo(FInfoIndex);
   (BorlandIDEServices as INTAEnvironmentOptionsServices).UnregisterAddInOptions(FAddInOptions);
-  (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
+  UnregisterKeyboardBinding;
   FreeAndNil(FPasfmtMenu);
   FreeAndNil(FBitmaps);
   inherited;
@@ -192,6 +201,17 @@ begin
   (BorlandIDEServices as IOTAServices).GetEnvironmentOptions.EditOptions('', 'Pasfmt');
 end;
 
+procedure TPlugin.RegisterKeyboardBinding;
+begin
+  FKeyboardBindingIndex :=
+      (BorlandIDEServices as IOTAKeyboardServices).AddKeyboardBinding(TPasfmtKeyboardBinding.Create);
+end;
+
+procedure TPlugin.UnregisterKeyboardBinding;
+begin
+  (BorlandIDEServices as IOTAKeyboardServices).RemoveKeyboardBinding(FKeyboardBindingIndex);
+end;
+
 procedure TPlugin.OnFormatKeyPress(
     const Context: IOTAKeyContext;
     KeyCode: TShortCut;
@@ -229,7 +249,7 @@ end;
 procedure TPasfmtKeyboardBinding.BindKeyboard(const BindingServices: IOTAKeyBindingServices);
 begin
   BindingServices
-      .AddKeyBinding([ShortCut(Ord('F'), [ssCtrl, ssAlt])], GPlugin.OnFormatKeyPress, nil, 0, '', 'PasfmtFormatItem');
+      .AddKeyBinding([PasfmtSettings.FormatHotkey], GPlugin.OnFormatKeyPress, nil, 0, '', 'PasfmtFormatItem');
 end;
 
 function TPasfmtKeyboardBinding.GetBindingType: TBindingType;

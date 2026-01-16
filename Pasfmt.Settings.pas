@@ -4,7 +4,9 @@ interface
 
 uses
   Pasfmt.Log,
-  System.Win.Registry;
+  System.Win.Registry,
+  System.Classes,
+  System.SysUtils;
 
 type
   TPasfmtSettings = class(TObject)
@@ -15,6 +17,7 @@ type
       CFormatOnSaveName = 'Format On Save';
       CFormatTimeoutName = 'Format Timeout';
       CMaxFileKiBWithUndoHistory = 'Max File Size With Undo History';
+      CFormatHotkey = 'Format Hotkey';
   private
     FRegistry: TRegistry;
     FBaseKey: string;
@@ -24,12 +27,16 @@ type
     FFormatOnSave: Boolean;
     FFormatTimeout: Integer;
     FMaxFileKiBWithUndoHistory: Integer;
+    FFormatHotkey: TShortCut;
+
+    FFormatHotkeyChanged: TProc;
 
     procedure SetLogLevel(Value: TLogLevel);
     procedure SetExecutablePath(Value: string);
     procedure SetFormatOnSave(Value: Boolean);
     procedure SetFormatTimeout(Value: Integer);
     procedure SetMaxFileKiBWithUndoHistory(Value: Integer);
+    procedure SetFormatHotkey(Value: TShortCut);
   public
     constructor Create;
     destructor Destroy; override;
@@ -41,6 +48,9 @@ type
     property FormatOnSave: Boolean read FFormatOnSave write SetFormatOnSave;
     property FormatTimeout: Integer read FFormatTimeout write SetFormatTimeout;
     property MaxFileKiBWithUndoHistory: Integer read FMaxFileKiBWithUndoHistory write SetMaxFileKiBWithUndoHistory;
+    property FormatHotkey: TShortCut read FFormatHotkey write SetFormatHotkey;
+
+    property OnFormatHotkeyChanged: TProc write FFormatHotkeyChanged;
   end;
 
 function PasfmtSettings: TPasfmtSettings;
@@ -49,8 +59,8 @@ implementation
 
 uses
   ToolsAPI,
-  System.SysUtils,
-  Winapi.Windows;
+  Winapi.Windows,
+  Vcl.Menus;
 
 var
   GSettings: TPasfmtSettings;
@@ -72,6 +82,7 @@ begin
   FBaseKey := (BorlandIDEServices as IOTAServices).GetBaseRegistryKey + '\Pasfmt';
   FRegistry := TRegistry.Create(KEY_ALL_ACCESS);
   FRegistry.RootKey := HKEY_CURRENT_USER;
+  FFormatHotkeyChanged := nil;
 end;
 
 //______________________________________________________________________________________________________________________
@@ -94,6 +105,24 @@ begin
   finally
     FRegistry.CloseKey;
   end;
+end;
+
+procedure TPasfmtSettings.SetFormatHotkey(Value: TShortCut);
+begin
+  if FFormatHotkey = Value then
+    exit;
+
+  FFormatHotkey := Value;
+
+  FRegistry.OpenKey(FBaseKey, True);
+  try
+    FRegistry.WriteString(CFormatHotkey, ShortCutToText(Value));
+  finally
+    FRegistry.CloseKey;
+  end;
+
+  if Assigned(FFormatHotkeyChanged) then
+    FFormatHotkeyChanged;
 end;
 
 //______________________________________________________________________________________________________________________
@@ -163,6 +192,7 @@ begin
     FFormatOnSave := False;
     FFormatTimeout := 500;
     FMaxFileKiBWithUndoHistory := 1024;
+    FFormatHotkey := ShortCut(Ord('F'), [ssCtrl, ssAlt]);
 
     if FRegistry.ValueExists(CLogLevelName) then
       FLogLevel := TLogLevel(FRegistry.ReadInteger(CLogLevelName))
@@ -188,6 +218,11 @@ begin
       FMaxFileKiBWithUndoHistory := FRegistry.ReadInteger(CMaxFileKiBWithUndoHistory)
     else
       FRegistry.WriteInteger(CMaxFileKiBWithUndoHistory, FMaxFileKiBWithUndoHistory);
+
+    if FRegistry.ValueExists(CFormatHotkey) then
+      FFormatHotkey := TextToShortCut(FRegistry.ReadString(CFormatHotkey))
+    else
+      FRegistry.WriteString(CFormatHotkey, ShortCutToText(FFormatHotkey));
   finally
     FRegistry.CloseKey;
   end;

@@ -2,21 +2,21 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   Left = 0
   Top = 0
   Width = 392
-  Height = 376
+  Height = 395
   Constraints.MinHeight = 180
   Constraints.MinWidth = 390
   TabOrder = 0
   object LogLevelLabel: TLabel
     Left = 3
-    Top = 48
+    Top = 105
     Width = 116
     Height = 15
     Caption = 'Minimum log severity'
   end
   object ExePathLabel: TLabel
     Left = 3
-    Top = 205
-    Width = 103
+    Top = 262
+    Width = 102
     Height = 15
     Caption = 'Executable location'
   end
@@ -29,26 +29,35 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object TimeoutLabel: TLabel
     Left = 3
-    Top = 104
+    Top = 161
     Width = 110
     Height = 15
     Caption = 'Format timeout (ms)'
   end
   object FastModeThresholdLabel: TLabel
     Left = 3
-    Top = 155
-    Width = 220
+    Top = 212
+    Width = 219
     Height = 15
     Cursor = crHelp
     Hint = 
-      'To avoid performance issues with updating large files, a faster method ' +
-      'is used when the file size exceeds this configured threshold.'#13#10'This ' +
-      'faster method unfortunately clears the undo history of the edit buffer.'
+      'To avoid performance issues with updating large files, a faster ' +
+      'method is used when the file size exceeds this configured thresh' +
+      'old.'#13#10'This faster method unfortunately clears the undo history o' +
+      'f the edit buffer.'
     Caption = 'Maximum file size with undo history (KiB)'
+  end
+  object FormatHotkeyLabel: TLabel
+    Left = 3
+    Top = 49
+    Width = 75
+    Height = 15
+    Cursor = crHelp
+    Caption = 'Fomat Hotkey'
   end
   object LogLevelCombo: TComboBox
     Left = 11
-    Top = 66
+    Top = 123
     Width = 129
     Height = 23
     Style = csDropDownList
@@ -62,7 +71,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathBrowseButton: TButton
     Left = 309
-    Top = 304
+    Top = 361
     Width = 71
     Height = 23
     Caption = 'Browse...'
@@ -71,7 +80,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathRadioGroup: TRadioGroup
     Left = 3
-    Top = 210
+    Top = 267
     Width = 185
     Height = 65
     ItemIndex = 0
@@ -84,7 +93,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object ExePathEdit: TEdit
     Left = 29
-    Top = 275
+    Top = 332
     Width = 351
     Height = 23
     TabOrder = 1
@@ -99,7 +108,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object TimeoutEdit: TEdit
     Left = 11
-    Top = 122
+    Top = 179
     Width = 129
     Height = 23
     NumbersOnly = True
@@ -110,7 +119,7 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
   end
   object FastModeThresholdEdit: TEdit
     Left = 11
-    Top = 173
+    Top = 230
     Width = 129
     Height = 23
     NumbersOnly = True
@@ -119,10 +128,19 @@ object PasfmtSettingsFrame: TPasfmtSettingsFrame
     TabOrder = 6
     Text = '1024'
   end
+  object FormatHotkeyEdit: THotKey
+    Left = 11
+    Top = 67
+    Width = 121
+    Height = 23
+    HotKey = 0
+    Modifiers = []
+    TabOrder = 7
+  end
   object ExeChooseDialog: TOpenDialog
     Filter = 'Executable files (*.exe)|*.exe'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 291
-    Top = 52
+    Top = 109
   end
 end
